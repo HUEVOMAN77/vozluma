@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ubicación: app/src/main/res/values/colors.xml -->
+<resources>
+    <color name="primary">#5B4BDB</color>
+    <color name="primary_dark">#32247F</color>
+    <color name="secondary">#E86A92</color>
+    <color name="surface_light">#F8F7FC</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_stroke">#E4E1F1</color>
+    <color name="text_primary">#211F2B</color>
+    <color name="text_secondary">#696572</color>
+    <color name="white">#FFFFFF</color>
+</resources>

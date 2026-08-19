@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ubicación: app/src/main/res/values/strings.xml -->
+<resources>
+    <string name="app_name">VozLuma</string>
+    <string name="app_tagline">Tu asistente de notificaciones y llamadas, en voz alta y sin conexión.</string>
+    <string name="assistant_switch">Asistente activo</string>
+    <string name="permissions_title">Configuración rápida</string>
+    <string name="permissions_description">Concede a VozLuma el acceso a notificaciones para leer mensajes seleccionados. También puedes permitir contactos para anunciar el nombre de quien llama.</string>
+    <string name="open_notification_settings">Conceder acceso a notificaciones</string>
+    <string name="test_voice">Probar la voz</string>
+    <string name="privacy_note">VozLuma funciona de forma local. No envía tus notificaciones, llamadas ni contactos a ningún servidor.</string>
+    <string name="notification_service_label">VozLuma: acceso a notificaciones</string>
+    <string name="status_assistant_on">Asistente encendido</string>
+    <string name="status_assistant_off">Asistente apagado</string>
+    <string name="status_access_granted">Acceso a notificaciones concedido</string>
+    <string name="status_access_missing">Falta conceder el acceso a notificaciones</string>
+</resources>

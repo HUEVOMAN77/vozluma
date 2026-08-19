@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ubicación: app/src/main/res/drawable/ic_vozluma.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#5B4BDB"
+        android:pathData="M54,4A50,50 0,1 0,54 104A50,50 0,1 0,54 4" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,25A15,15 0,0 0,39 40L39,56A15,15 0,0 0,69 56L69,40A15,15 0,0 0,54 25M54,31A9,9 0,0 1,63 40L63,56A9,9 0,0 1,45 56L45,40A9,9 0,0 1,54 31" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M77,49L77,56A23,23 0,0 1,54 79A23,23 0,0 1,31 56L31,49L37,49L37,56A17,17 0,0 0,71 56L71,49Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,77L57,77L57,87L51,87Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,87L66,87L66,93L42,93Z" />
+</vector>
