@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma 2.0.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 2.0.1** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -42,6 +42,7 @@ El proyecto integra `vosk-model-small-es-0.42` en `app/src/main/assets/model-es`
 | Vosk Android | 0.3.75 |
 | Compile SDK | 35 |
 | Android mínimo | API 26 / Android 8.0 |
+| Application ID | `com.vozluma.premium` |
 
 ## Compilación
 
@@ -51,7 +52,9 @@ Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. T
 ./gradlew assembleDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-debug.apk`.
+El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-premium-debug.apk`.
+
+Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
 
 ## Configuración inicial
 

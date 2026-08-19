@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Ubicación: app/src/main/res/values/strings.xml -->
 <resources>
-    <string name="app_name">VozLuma</string>
+    <string name="app_name">VozLuma Premium</string>
     <string name="app_tagline">Tu asistente de notificaciones y llamadas, en voz alta y sin conexión.</string>
     <string name="premium_badge">EDICIÓN PRIVADA · OFFLINE</string>
     <string name="premium_tagline">Claridad cuando la necesitas. Control cuando lo decides.</string>
