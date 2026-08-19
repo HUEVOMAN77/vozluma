@@ -3,6 +3,7 @@ package com.vozluma.app
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import com.google.android.material.textfield.TextInputEditText
 import androidx.appcompat.app.AppCompatActivity
 
@@ -22,10 +23,18 @@ class ReplyDraftActivity : AppCompatActivity() {
             val text = input.text?.toString().orEmpty().trim()
             if (text.isNotBlank()) {
                 ReplyDraftStore.save(this, text)
-                startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                val shareIntent = Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, text)
-                }, getString(R.string.share_reply_title)))
+                }, getString(R.string.share_reply_title))
+                runCatching { startActivity(shareIntent) }
+                    .onFailure {
+                        Toast.makeText(
+                            this,
+                            R.string.share_reply_unavailable,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
             }
         }
 

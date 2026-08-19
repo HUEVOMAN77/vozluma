@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma Premium 3.1.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 3.2.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -15,7 +15,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español; el modelo viene integrado en la APK. |
 | Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
 | Música offline | Reproducir, pausar, detener, siguiente, anterior, abrir reproductor y subir/bajar volumen mediante MediaSession y teclas multimedia del sistema. |
-| Suite de teléfono | Llamadas con marcador y confirmación, SMS preparados para revisar, cámara, mapas, alarmas, calendario y ajustes. |
+| Suite de teléfono | Llamadas con marcador y confirmación, SMS preparados para revisar, cámara, mapas, alarmas y calendario con fallback seguro, además de ajustes. |
 | Accesibilidad | Lectura de pantalla y acciones globales opcionales, siempre activadas manualmente por el usuario. |
 | Rutinas | Modo dormir, estudio, trabajo, viaje, coche, casa y normal con preferencias locales. |
 | Respuestas | Dictado local de un borrador, revisión, edición y selector de aplicación; nunca hay envío automático. |
@@ -27,7 +27,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Acceso rápido | Widget para pausar o activar la escucha cuando el micrófono ya tiene permiso. |
 | Conversación offline | Después de «Hola», mantiene una ventana de conversación de 20 segundos para varias preguntas sin repetir la activación. |
 | Personalización | Biblioteca para crear frases y respuestas personalizadas completamente locales. |
-| Control del sistema | Intents seguros para abrir ajustes, temporizadores, reproductor de música y otras funciones disponibles en el teléfono. |
+| Control del sistema | Intents protegidos contra errores para abrir ajustes, temporizadores, reproductor de música y otras funciones disponibles en el teléfono. |
 | Dashboard | Estado de permisos, estado de escucha, diagnóstico de voz, salud de batería, almacenamiento libre y estado del modelo offline. |
 
 ## Interfaz
@@ -61,7 +61,7 @@ Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. T
 ./gradlew assembleDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.1.0.apk`.
+El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.2.0.apk`.
 
 Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
 
@@ -86,6 +86,7 @@ app/src/main/
 ├── AndroidManifest.xml
 ├── assets/vosk-model-small-es-0.42.zip   # Modelo español integrado
 ├── filesDir/model-es/                    # Modelo instalado en el dispositivo
+├── drawable/ic_vozluma.xml               # Icono moderno oficial
 ├── java/com/vozluma/app/
 │   ├── AudioRouteChecker.kt
 │   ├── CustomCommandStore.kt

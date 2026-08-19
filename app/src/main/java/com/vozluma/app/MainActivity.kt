@@ -235,7 +235,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureButtons() {
         findViewById<Button>(R.id.button_notification_access).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            openSystemSettingsSafely(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
         }
         findViewById<Button>(R.id.button_test_voice).setOnClickListener {
             when {
@@ -258,7 +258,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
         findViewById<Button>(R.id.button_accessibility_settings).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            openSystemSettingsSafely(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
         findViewById<Button>(R.id.button_custom_commands).setOnClickListener {
             startActivity(Intent(this, CustomCommandsActivity::class.java))
@@ -391,6 +391,15 @@ class MainActivity : AppCompatActivity() {
         if (permissionsToRequest.isNotEmpty()) requestPermissions(
             permissionsToRequest.toTypedArray(), BASIC_PERMISSIONS_REQUEST_CODE
         )
+    }
+
+    private fun openSystemSettingsSafely(intent: Intent) {
+        runCatching {
+            if (intent.resolveActivity(packageManager) == null) error("Ajustes no disponibles")
+            startActivity(intent)
+        }.onFailure {
+            Toast.makeText(this, R.string.settings_unavailable, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun applySavedTheme() {

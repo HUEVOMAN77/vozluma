@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 
@@ -40,9 +41,13 @@ class PrivacyActivity : AppCompatActivity() {
                 .show()
         }
         findViewById<Button>(R.id.button_open_app_settings).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
-            })
+            runCatching {
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                })
+            }.onFailure {
+                Toast.makeText(this, R.string.settings_unavailable, Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

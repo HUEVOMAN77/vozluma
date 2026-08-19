@@ -47,6 +47,7 @@
     <string name="share_reply">Revisar y compartir</string>
     <string name="discard_reply">Descartar borrador</string>
     <string name="share_reply_title">Elegir aplicación para compartir</string>
+    <string name="share_reply_unavailable">No hay una aplicación compatible para compartir este borrador.</string>
     <string name="open_privacy_center">Centro de privacidad</string>
     <string name="open_custom_commands">Crear comandos personalizados</string>
     <string name="custom_commands_title">Comandos a tu medida</string>
@@ -73,6 +74,7 @@
     <string name="clear_all_local_data_message">Se eliminarán el historial, los contactos prioritarios y el borrador de respuesta. Esta acción no se puede deshacer.</string>
     <string name="privacy_data_cleared">Historial, contactos prioritarios y borrador eliminados.</string>
     <string name="open_app_settings">Abrir ajustes de permisos</string>
+    <string name="settings_unavailable">Android no permite abrir esta pantalla de ajustes en este momento.</string>
     <string name="options_title">Modos y privacidad</string>
     <string name="smart_filters_switch">Filtros inteligentes</string>
     <string name="only_headphones_switch">Leer solo con auriculares o Bluetooth</string>

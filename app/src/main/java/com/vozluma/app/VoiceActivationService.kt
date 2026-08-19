@@ -165,9 +165,12 @@ class VoiceActivationService : Service(), RecognitionListener {
             waitingForReply = false
             ReplyDraftStore.save(this, command.trim())
             ttsManager.speak("Preparé tu respuesta. Revisa la pantalla y confirma antes de compartirla")
-            startActivity(Intent(this, ReplyDraftActivity::class.java).apply {
+            val draftIntent = Intent(this, ReplyDraftActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
+            }
+            if (!safeStartActivity(draftIntent)) {
+                ttsManager.speak("No pude abrir la pantalla de revisión")
+            }
             restartListeningWithDelay(COMMAND_DELAY_MS)
             return
         }
@@ -239,8 +242,8 @@ class VoiceActivationService : Service(), RecognitionListener {
             normalized.contains("ir al inicio") || normalized.contains("pantalla de inicio") -> globalAccessibilityAction("home")
             normalized.contains("abre las notificaciones") -> globalAccessibilityAction("notifications")
             normalized.contains("ajustes del teléfono") || normalized.contains("ajustes del telefono") -> {
-                openSystemSettings(Settings.ACTION_SETTINGS)
-                "Abrí los ajustes del teléfono"
+                if (openSystemSettings(Settings.ACTION_SETTINGS)) "Abrí los ajustes del teléfono"
+                else "No pude abrir los ajustes del teléfono"
             }
             normalized.contains("silencia") || normalized.contains("modo silencio") -> {
                 PreferencesStore.setAssistantEnabled(this, false)
@@ -281,22 +284,28 @@ class VoiceActivationService : Service(), RecognitionListener {
                 "Activé el modo coche"
             }
             normalized.contains("ajustes de sonido") || normalized.contains("configuración de sonido") -> {
-                openSystemSettings(Settings.ACTION_SOUND_SETTINGS)
-                "Abrí los ajustes de sonido"
+                if (openSystemSettings(Settings.ACTION_SOUND_SETTINGS)) "Abrí los ajustes de sonido"
+                else "No pude abrir los ajustes de sonido"
             }
             normalized.contains("ajustes de bluetooth") || normalized.contains("configuración de bluetooth") -> {
-                openSystemSettings(Settings.ACTION_BLUETOOTH_SETTINGS)
-                "Abrí los ajustes de Bluetooth"
+                if (openSystemSettings(Settings.ACTION_BLUETOOTH_SETTINGS)) "Abrí los ajustes de Bluetooth"
+                else "No pude abrir los ajustes de Bluetooth"
             }
             normalized.contains("temporizador") -> {
                 val minutes = parseMinutes(normalized)
                 if (minutes != null && minutes in 1..720) {
-                    startActivity(Intent(AlarmClock.ACTION_SET_TIMER).apply {
+                    val timerIntent = Intent(AlarmClock.ACTION_SET_TIMER).apply {
                         putExtra(AlarmClock.EXTRA_LENGTH, minutes * 60)
                         putExtra(AlarmClock.EXTRA_SKIP_UI, false)
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    })
-                    "Preparé un temporizador de $minutes minutos"
+                    }
+                    if (safeStartActivity(timerIntent)) {
+                        "Preparé un temporizador de $minutes minutos"
+                    } else if (safeStartActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))) {
+                        "Abrí el reloj. Este teléfono no permite crear el temporizador automáticamente"
+                    } else {
+                        "No encontré una aplicación de reloj compatible"
+                    }
                 } else {
                     "Dime el número de minutos, por ejemplo: temporizador de diez minutos"
                 }
@@ -332,10 +341,14 @@ class VoiceActivationService : Service(), RecognitionListener {
         if (query.isBlank()) return "Dime el nombre del contacto al que quieres llamar"
         val number = findContactNumber(query)
             ?: return "No encontré a $query en tus contactos o falta el permiso de contactos"
-        startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}")).apply {
+        val dialIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}")).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
-        return "Abrí el marcador para llamar a $query. Revisa el número y confirma la llamada"
+        }
+        return if (safeStartActivity(dialIntent)) {
+            "Abrí el marcador para llamar a $query. Revisa el número y confirma la llamada"
+        } else {
+            "No encontré un marcador compatible para llamar a $query"
+        }
     }
 
     private fun prepareSms(command: String): String {
@@ -354,11 +367,15 @@ class VoiceActivationService : Service(), RecognitionListener {
         }
         val number = findContactNumber(recipientText)
             ?: return "No encontré a $recipientText en tus contactos o falta el permiso de contactos"
-        startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(number)}")).apply {
+        val smsIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(number)}")).apply {
             putExtra("sms_body", body)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
-        return "Preparé el mensaje para $recipientText. Revísalo y pulsa enviar"
+        }
+        return if (safeStartActivity(smsIntent)) {
+            "Preparé el mensaje para $recipientText. Revísalo y pulsa enviar"
+        } else {
+            "No encontré una aplicación de mensajes compatible"
+        }
     }
 
     private fun findContactNumber(query: String): String? {
@@ -377,24 +394,22 @@ class VoiceActivationService : Service(), RecognitionListener {
         }
     }
 
-    private fun openCamera(): String {
-        return try {
-            startActivity(Intent(MediaStore.ACTION_IMAGE_CAPTURE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    private fun openCamera(): String =
+        if (safeStartActivity(Intent(MediaStore.ACTION_IMAGE_CAPTURE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))) {
             "Abrí la cámara"
-        } catch (_: Exception) {
+        } else {
             "No encontré una aplicación de cámara"
         }
-    }
 
     private fun openMap(command: String): String {
         val destination = command.substringAfter("navega a", command.substringAfter("llévame a", command.substringAfter("llevame a", ""))).trim()
         if (destination.isBlank()) return "Dime a qué lugar quieres navegar"
-        return try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${Uri.encode(destination)}")).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
+        val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${Uri.encode(destination)}")).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return if (safeStartActivity(mapIntent)) {
             "Abrí el mapa para $destination"
-        } catch (_: Exception) {
+        } else {
             "No encontré una aplicación de mapas"
         }
     }
@@ -405,24 +420,30 @@ class VoiceActivationService : Service(), RecognitionListener {
         val hour = match.groupValues[1].toIntOrNull() ?: return "No entendí la hora"
         val minute = match.groupValues.getOrNull(2)?.toIntOrNull() ?: 0
         if (hour !in 0..23 || minute !in 0..59) return "La hora no es válida"
-        startActivity(Intent(AlarmClock.ACTION_SET_ALARM).apply {
+        val alarmIntent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
             putExtra(AlarmClock.EXTRA_HOUR, hour)
             putExtra(AlarmClock.EXTRA_MINUTES, minute)
             putExtra(AlarmClock.EXTRA_SKIP_UI, false)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
-        return "Preparé una alarma para las %02d:%02d. Confirma en la aplicación de reloj".format(hour, minute)
+        }
+        return when {
+            safeStartActivity(alarmIntent) ->
+                "Preparé una alarma para las %02d:%02d. Confirma en la aplicación de reloj".format(hour, minute)
+            safeStartActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) ->
+                "Abrí el reloj. Este teléfono no permite crear la alarma automáticamente"
+            else -> "No encontré una aplicación de reloj compatible"
+        }
     }
 
     private fun openCalendar(command: String): String {
         val title = command.substringAfter("evento", "").trim().ifBlank { "Evento de VozLuma" }
-        return try {
-            startActivity(Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
-                putExtra(CalendarContract.Events.TITLE, title)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            })
+        val calendarIntent = Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
+            putExtra(CalendarContract.Events.TITLE, title)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return if (safeStartActivity(calendarIntent)) {
             "Abrí el calendario para preparar el evento. Revísalo y guárdalo"
-        } catch (_: Exception) {
+        } else {
             "No encontré una aplicación de calendario"
         }
     }
@@ -504,9 +525,16 @@ class VoiceActivationService : Service(), RecognitionListener {
         ).entries.firstOrNull { text.contains(it.key) }?.value
     }
 
-    private fun openSystemSettings(action: String) {
-        startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    private fun safeStartActivity(intent: Intent): Boolean {
+        return runCatching {
+            if (intent.resolveActivity(packageManager) == null) return false
+            startActivity(intent)
+            true
+        }.getOrDefault(false)
     }
+
+    private fun openSystemSettings(action: String): Boolean =
+        safeStartActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 
     private fun latestNotificationAnswer(): String {
         val latest = HistoryStore.getAll(this).firstOrNull()
