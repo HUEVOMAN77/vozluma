@@ -10,6 +10,12 @@
     <string name="insights_title">Estado del dispositivo</string>
     <string name="insights_description">Batería y almacenamiento local disponibles.</string>
     <string name="insights_value">Batería: %1$d%% · Espacio libre: %2$d GB · Modelo offline listo</string>
+    <string name="model_card_title">Modelo de voz offline</string>
+    <string name="model_card_description">Descárgalo una sola vez. Después VozLuma reconoce «Hola» sin Internet y la APK ocupa mucho menos.</string>
+    <string name="download_model">Descargar modelo español</string>
+    <string name="model_ready">Modelo instalado. VozLuma puede funcionar sin Internet.</string>
+    <string name="model_downloading">Descargando modelo: %1$d%%</string>
+    <string name="model_download_error">No se pudo descargar el modelo. Revisa Internet e inténtalo de nuevo.</string>
     <string name="assistant_switch">Asistente activo</string>
     <string name="voice_activation_switch">Activación por voz: «Hola»</string>
     <string name="permissions_title">Configuración rápida</string>

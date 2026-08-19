@@ -20,11 +20,10 @@ import org.vosk.Model
 import org.vosk.Recognizer
 import org.vosk.android.RecognitionListener
 import org.vosk.android.SpeechService
-import org.vosk.android.StorageService
 
 /**
  * Ubicación: app/src/main/java/com/vozluma/app/VoiceActivationService.kt
- * Escucha localmente la palabra «Hola» usando el modelo español incluido en assets.
+ * Escucha localmente la palabra «Hola» usando el modelo español instalado en filesDir.
  * Android muestra una notificación permanente mientras el micrófono está activo.
  */
 class VoiceActivationService : Service(), RecognitionListener {
@@ -95,23 +94,18 @@ class VoiceActivationService : Service(), RecognitionListener {
     }
 
     private fun loadLocalModel() {
-        StorageService.unpack(
-            this,
-            "model-es",
-            "model-es",
-            { unpackedModel ->
-                if (shuttingDown) {
-                    unpackedModel.close()
-                    return@unpack
-                }
-                model = unpackedModel
-                startListening()
-            },
-            { exception ->
-                ttsManager.speak("No pude cargar el modelo de voz local")
-                stopSelf()
-            }
-        )
+        if (!ModelManager.isReady(this)) {
+            ttsManager.speak("Primero descarga el modelo de voz desde la pantalla principal")
+            stopSelf()
+            return
+        }
+        try {
+            model = Model(ModelManager.modelDirectory(this).absolutePath)
+            startListening()
+        } catch (_: Exception) {
+            ttsManager.speak("No pude cargar el modelo de voz local")
+            stopSelf()
+        }
     }
 
     private fun startListening() {

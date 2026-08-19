@@ -7,7 +7,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.SeekBar
@@ -29,6 +31,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var voiceActivationSwitch: SwitchMaterial
     private lateinit var accessStatusText: TextView
     private lateinit var quietHoursText: TextView
+    private lateinit var modelStatusText: TextView
+    private lateinit var modelProgress: ProgressBar
+    private lateinit var modelDownloadButton: Button
     private lateinit var ttsManager: TTSManager
     private var waitingToStartVoice = false
 
@@ -47,12 +52,16 @@ class MainActivity : AppCompatActivity() {
         voiceActivationSwitch = findViewById(R.id.switch_voice_activation)
         accessStatusText = findViewById(R.id.text_access_status)
         quietHoursText = findViewById(R.id.text_quiet_hours)
+        modelStatusText = findViewById(R.id.text_model_status)
+        modelProgress = findViewById(R.id.progress_model_download)
+        modelDownloadButton = findViewById(R.id.button_download_model)
         ttsManager = TTSManager(this)
 
         configurePrimarySwitches()
         configureFeatureSwitches()
         configureAppSwitches()
         configureButtons()
+        configureModelDownload()
         requestRuntimePermissionsIfNeeded()
         updateStatusText()
         updateDeviceInsights()
@@ -62,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         updateStatusText()
         updateDeviceInsights()
+        updateModelStatus()
     }
 
     override fun onRequestPermissionsResult(
@@ -95,9 +105,17 @@ class MainActivity : AppCompatActivity() {
             updateStatusText()
         }
 
-        voiceActivationSwitch.isChecked = PreferencesStore.isVoiceActivationEnabled(this)
+        val voiceEnabled = PreferencesStore.isVoiceActivationEnabled(this) && ModelManager.isReady(this)
+        if (!voiceEnabled) PreferencesStore.setVoiceActivationEnabled(this, false)
+        voiceActivationSwitch.isChecked = voiceEnabled
         voiceActivationSwitch.setOnCheckedChangeListener { _, isChecked ->
             PreferencesStore.setVoiceActivationEnabled(this, isChecked)
+            if (isChecked && !ModelManager.isReady(this)) {
+                PreferencesStore.setVoiceActivationEnabled(this, false)
+                voiceActivationSwitch.isChecked = false
+                downloadModel()
+                return@setOnCheckedChangeListener
+            }
             if (isChecked) requestVoicePermissionAndStart() else stopVoiceActivationService()
             updateStatusText()
         }
@@ -167,6 +185,50 @@ class MainActivity : AppCompatActivity() {
         configureSwitch(R.id.switch_samsung_messages, PreferencesStore.isPackageEnabled(this, "com.samsung.android.messaging")) {
             PreferencesStore.setPackageEnabled(this, "com.samsung.android.messaging", it)
         }
+    }
+
+    private fun configureModelDownload() {
+        modelDownloadButton.setOnClickListener { downloadModel() }
+        updateModelStatus()
+    }
+
+    private fun updateModelStatus() {
+        if (ModelManager.isReady(this)) {
+            modelStatusText.setText(R.string.model_ready)
+            modelDownloadButton.isEnabled = false
+            modelProgress.visibility = View.GONE
+        } else {
+            modelStatusText.setText(R.string.model_card_description)
+            modelDownloadButton.isEnabled = true
+        }
+    }
+
+    private fun downloadModel() {
+        if (ModelManager.isReady(this)) return
+        modelDownloadButton.isEnabled = false
+        modelProgress.progress = 0
+        modelProgress.visibility = View.VISIBLE
+        ModelManager.download(
+            this,
+            onProgress = { progress ->
+                runOnUiThread {
+                    modelProgress.progress = progress
+                    modelStatusText.text = getString(R.string.model_downloading, progress)
+                }
+            },
+            onComplete = { result ->
+                runOnUiThread {
+                    modelProgress.visibility = View.GONE
+                    if (result.isSuccess) {
+                        modelStatusText.setText(R.string.model_ready)
+                        modelDownloadButton.isEnabled = false
+                    } else {
+                        modelStatusText.setText(R.string.model_download_error)
+                        modelDownloadButton.isEnabled = true
+                    }
+                }
+            }
+        )
     }
 
     private fun configureButtons() {
