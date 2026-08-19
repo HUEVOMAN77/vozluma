@@ -26,8 +26,13 @@ class NotificationService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (!PreferencesStore.isAssistantEnabled(this)) return
+        if (PreferencesStore.isQuietNow(this)) return
         if (sbn.packageName == packageName) return
-        if (!isSupportedPackage(sbn.packageName)) return
+        if (!PreferencesStore.supportedPackages.containsKey(sbn.packageName)) return
+        if (!PreferencesStore.isPackageEnabled(this, sbn.packageName)) return
+        if (PreferencesStore.onlyWithHeadphones(this) &&
+            !AudioRouteChecker.hasHeadphonesOrBluetooth(this)
+        ) return
 
         val notification = sbn.notification ?: return
         if (notification.flags and Notification.FLAG_ONGOING_EVENT != 0) return
@@ -45,6 +50,7 @@ class NotificationService : NotificationListenerService() {
         if (message.isBlank()) return
 
         val normalizedMessage = message.replace(Regex("\\s+"), " ").trim()
+        if (PreferencesStore.areSmartFiltersEnabled(this) && isLowValueNotification(normalizedMessage)) return
         val deduplicationKey = listOf(sbn.packageName, sbn.tag, title, normalizedMessage).joinToString("|")
         if (isDuplicate(deduplicationKey)) return
 
@@ -55,9 +61,15 @@ class NotificationService : NotificationListenerService() {
         } catch (_: Exception) {
             friendlyApplicationName(sbn.packageName)
         }
-
         val sender = title.takeUnless { it.isNullOrBlank() } ?: "Alguien"
-        ttsManager.speak("$sender en $applicationName dice: $normalizedMessage")
+        val spokenText = if (PreferencesStore.isCarModeEnabled(this)) {
+            "$applicationName. $sender dice: $normalizedMessage"
+        } else {
+            "$sender en $applicationName dice: $normalizedMessage"
+        }
+
+        HistoryStore.add(this, applicationName, sender, normalizedMessage)
+        ttsManager.speak(spokenText)
     }
 
     override fun onDestroy() {
@@ -76,6 +88,16 @@ class NotificationService : NotificationListenerService() {
         ).orEmpty()
     }
 
+    private fun isLowValueNotification(message: String): Boolean {
+        val normalized = message.lowercase()
+        val lowValueMarkers = listOf(
+            "código de verificación", "codigo de verificacion", "verification code",
+            "código de seguridad", "codigo de seguridad", "oferta exclusiva",
+            "promoción", "promocion", "descuento", "unsubscribe", "suscríbete", "suscribete"
+        )
+        return lowValueMarkers.any(normalized::contains)
+    }
+
     private fun isDuplicate(key: String): Boolean {
         val now = System.currentTimeMillis()
         synchronized(recentlyRead) {
@@ -86,28 +108,11 @@ class NotificationService : NotificationListenerService() {
         }
     }
 
-    private fun isSupportedPackage(packageName: String): Boolean {
-        val supportedPackages = setOf(
-            "com.whatsapp",
-            "com.facebook.orca",
-            "com.facebook.katana",
-            "com.instagram.android",
-            "com.google.android.apps.messaging",
-            "com.android.mms",
-            "com.samsung.android.messaging"
-        )
-        return packageName in supportedPackages
-    }
-
-    private fun friendlyApplicationName(packageName: String): String = when (packageName) {
-        "com.whatsapp" -> "WhatsApp"
-        "com.facebook.orca" -> "Messenger"
-        "com.facebook.katana" -> "Facebook"
-        "com.instagram.android" -> "Instagram"
-        else -> packageName.substringAfterLast('.').replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-        }
-    }
+    private fun friendlyApplicationName(packageName: String): String =
+        PreferencesStore.supportedPackages[packageName]
+            ?: packageName.substringAfterLast('.').replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
 
     private fun firstNonBlank(vararg values: String?): String? =
         values.firstOrNull { !it.isNullOrBlank() && !TextUtils.equals(it, "null") }

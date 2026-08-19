@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="12dp"
             android:text="@string/app_name"
             android:textColor="@color/primary_dark"
             android:textSize="36sp"
@@ -33,7 +33,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             app:cardBackgroundColor="@color/card_background"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
@@ -55,6 +55,16 @@
                     android:textSize="18sp"
                     app:useMaterialThemeColors="true" />
 
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_voice_activation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/voice_activation_switch"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    app:useMaterialThemeColors="true" />
+
                 <TextView
                     android:id="@+id/text_access_status"
                     android:layout_width="match_parent"
@@ -68,7 +78,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="28dp"
             android:text="@string/permissions_title"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
@@ -97,6 +107,138 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/test_voice"
+            app:cornerRadius="14dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/apps_title"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/apps_description"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_whatsapp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WhatsApp" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_messenger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Messenger" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_facebook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Facebook" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_instagram"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Instagram" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_google_messages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mensajes de Google" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_sms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SMS" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_samsung_messages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mensajes Samsung" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:text="@string/options_title"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_smart_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/smart_filters_switch" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_only_headphones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/only_headphones_switch" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_car_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/car_mode_switch" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_quiet_hours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/quiet_hours_switch" />
+        <TextView
+            android:id="@+id/text_quiet_hours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_quiet_hours"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/configure_quiet_hours"
+            app:cornerRadius="14dp" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_dark_theme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dark_theme_switch" />
+        <TextView
+            android:id="@+id/text_speech_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/speech_rate_label"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <SeekBar
+            android:id="@+id/seek_speech_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="80"
+            android:progress="35" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/history_switch" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_history"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/open_history"
             app:cornerRadius="14dp" />
 
         <TextView

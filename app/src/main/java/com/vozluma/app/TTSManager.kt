@@ -23,7 +23,7 @@ class TTSManager(context: Context) : TextToSpeech.OnInitListener {
             languageResult != TextToSpeech.LANG_NOT_SUPPORTED
 
         if (isReady) {
-            engine.setSpeechRate(0.95f)
+            engine.setSpeechRate(PreferencesStore.speechRate(appContext))
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) = Unit
                 override fun onDone(utteranceId: String?) = Unit
@@ -37,6 +37,7 @@ class TTSManager(context: Context) : TextToSpeech.OnInitListener {
         val cleanText = text.trim()
         if (!isReady || cleanText.isEmpty()) return
 
+        textToSpeech?.setSpeechRate(PreferencesStore.speechRate(appContext))
         textToSpeech?.speak(
             cleanText,
             TextToSpeech.QUEUE_FLUSH,
