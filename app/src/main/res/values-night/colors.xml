@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#B8A9FF</color>
+    <color name="primary_dark">#E7E1FF</color>
+    <color name="secondary">#FF9FC2</color>
+    <color name="surface_light">#0E1020</color>
+    <color name="card_background">#171A2E</color>
+    <color name="card_stroke">#303555</color>
+    <color name="text_primary">#F5F3FF</color>
+    <color name="text_secondary">#B8B5C7</color>
+    <color name="white">#FFFFFF</color>
+</resources>

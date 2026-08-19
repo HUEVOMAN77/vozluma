@@ -12,6 +12,8 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.AlarmClock
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import org.json.JSONObject
 import org.vosk.Model
@@ -31,6 +33,7 @@ class VoiceActivationService : Service(), RecognitionListener {
     private lateinit var ttsManager: TTSManager
     private val handler = Handler(Looper.getMainLooper())
     private var waitingForCommand = false
+    private var waitingForReply = false
     private var shuttingDown = false
 
     override fun onCreate() {
@@ -140,7 +143,23 @@ class VoiceActivationService : Service(), RecognitionListener {
         waitingForCommand = false
         stopListening()
         val normalized = command.lowercase()
+        if (waitingForReply) {
+            waitingForReply = false
+            ReplyDraftStore.save(this, command.trim())
+            ttsManager.speak("Preparé tu respuesta. Revisa la pantalla y confirma antes de compartirla")
+            startActivity(Intent(this, ReplyDraftActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+            restartListeningWithDelay(COMMAND_DELAY_MS)
+            return
+        }
         val answer = when {
+            normalized.contains("resumen") || normalized.contains("cuántas notificaciones") ||
+                normalized.contains("cuantas notificaciones") -> HistoryStore.summary(this)
+            normalized.contains("responder") || normalized.contains("contestar") -> {
+                waitingForReply = true
+                "Claro. Dime el texto de la respuesta"
+            }
             normalized.contains("última notificación") || normalized.contains("ultima notificacion") ||
                 normalized.contains("lee las notificaciones") || normalized.contains("lee mis notificaciones") ->
                 latestNotificationAnswer()
@@ -162,6 +181,27 @@ class VoiceActivationService : Service(), RecognitionListener {
                 PreferencesStore.setCarModeEnabled(this, true)
                 "Activé el modo coche"
             }
+            normalized.contains("ajustes de sonido") || normalized.contains("configuración de sonido") -> {
+                openSystemSettings(Settings.ACTION_SOUND_SETTINGS)
+                "Abrí los ajustes de sonido"
+            }
+            normalized.contains("ajustes de bluetooth") || normalized.contains("configuración de bluetooth") -> {
+                openSystemSettings(Settings.ACTION_BLUETOOTH_SETTINGS)
+                "Abrí los ajustes de Bluetooth"
+            }
+            normalized.contains("temporizador") -> {
+                val minutes = parseMinutes(normalized)
+                if (minutes != null && minutes in 1..720) {
+                    startActivity(Intent(AlarmClock.ACTION_SET_TIMER).apply {
+                        putExtra(AlarmClock.EXTRA_LENGTH, minutes * 60)
+                        putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    })
+                    "Preparé un temporizador de $minutes minutos"
+                } else {
+                    "Dime el número de minutos, por ejemplo: temporizador de diez minutos"
+                }
+            }
             normalized.contains("estado") -> {
                 if (PreferencesStore.isAssistantEnabled(this)) "El asistente está encendido" else "El asistente está apagado"
             }
@@ -171,6 +211,19 @@ class VoiceActivationService : Service(), RecognitionListener {
         }
         ttsManager.speak(answer)
         restartListeningWithDelay(COMMAND_DELAY_MS)
+    }
+
+    private fun parseMinutes(text: String): Int? {
+        Regex("\\d+").find(text)?.value?.toIntOrNull()?.let { return it }
+        return mapOf(
+            "uno" to 1, "dos" to 2, "tres" to 3, "cinco" to 5,
+            "diez" to 10, "quince" to 15, "veinte" to 20,
+            "treinta" to 30, "cuarenta" to 40, "sesenta" to 60
+        ).entries.firstOrNull { text.contains(it.key) }?.value
+    }
+
+    private fun openSystemSettings(action: String) {
+        startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     private fun latestNotificationAnswer(): String {

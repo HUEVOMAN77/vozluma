@@ -29,6 +29,14 @@ object HistoryStore {
 
     fun getAll(context: Context): List<Entry> = read(context)
 
+    fun summary(context: Context): String {
+        val entries = read(context)
+        if (entries.isEmpty()) return "No tienes notificaciones guardadas"
+        val grouped = entries.groupingBy { it.appName }.eachCount()
+            .entries.joinToString(", ") { "${it.value} de ${it.key}" }
+        return "Tienes ${entries.size} notificaciones recientes: $grouped"
+    }
+
     fun clear(context: Context) {
         context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
             .edit().remove(KEY_ENTRIES).apply()

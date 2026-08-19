@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -15,6 +14,9 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlin.math.roundToInt
 
@@ -33,7 +35,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         applySavedTheme()
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root_content)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(view.paddingLeft, systemBars.top + 8, view.paddingRight, systemBars.bottom + 28)
+            insets
+        }
 
         assistantSwitch = findViewById(R.id.switch_assistant)
         voiceActivationSwitch = findViewById(R.id.switch_voice_activation)
@@ -47,11 +55,13 @@ class MainActivity : AppCompatActivity() {
         configureButtons()
         requestRuntimePermissionsIfNeeded()
         updateStatusText()
+        updateDeviceInsights()
     }
 
     override fun onResume() {
         super.onResume()
         updateStatusText()
+        updateDeviceInsights()
     }
 
     override fun onRequestPermissionsResult(
@@ -173,6 +183,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_history).setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
+        findViewById<Button>(R.id.button_privacy_center).setOnClickListener {
+            startActivity(Intent(this, PrivacyActivity::class.java))
+        }
+        findViewById<Button>(R.id.button_priority_contacts).setOnClickListener {
+            startActivity(Intent(this, PriorityContactsActivity::class.java))
+        }
         findViewById<Button>(R.id.button_quiet_hours).setOnClickListener {
             showTimePicker(isStart = true)
         }
@@ -232,6 +248,16 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.status_voice_on)
         } else getString(R.string.status_voice_off)
         accessStatusText.text = "$assistantState\n$accessState\n$voiceState"
+    }
+
+    private fun updateDeviceInsights() {
+        val batteryManager = getSystemService(android.os.BatteryManager::class.java)
+        val battery = batteryManager?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            ?.takeIf { it in 0..100 } ?: 0
+        val stats = android.os.StatFs(filesDir.absolutePath)
+        val freeGb = stats.availableBytes / (1024L * 1024L * 1024L)
+        findViewById<TextView>(R.id.text_device_insights).text =
+            getString(R.string.insights_value, battery, freeGb)
     }
 
     private fun updateSpeechRateLabel(progress: Int) {

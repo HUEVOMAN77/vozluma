@@ -25,6 +25,18 @@
             android:exported="false" />
 
         <activity
+            android:name=".PriorityContactsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReplyDraftActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PrivacyActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

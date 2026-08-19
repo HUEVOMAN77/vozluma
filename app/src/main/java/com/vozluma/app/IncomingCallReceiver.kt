@@ -22,6 +22,7 @@ class IncomingCallReceiver : BroadcastReceiver() {
         val state = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
         if (state != TelephonyManager.EXTRA_STATE_RINGING) return
 
+        @Suppress("DEPRECATION")
         val number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
         val caller = resolveCaller(context, number)
         val pendingResult = goAsync()

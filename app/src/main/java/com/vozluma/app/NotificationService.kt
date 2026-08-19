@@ -26,7 +26,6 @@ class NotificationService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (!PreferencesStore.isAssistantEnabled(this)) return
-        if (PreferencesStore.isQuietNow(this)) return
         if (sbn.packageName == packageName) return
         if (!PreferencesStore.supportedPackages.containsKey(sbn.packageName)) return
         if (!PreferencesStore.isPackageEnabled(this, sbn.packageName)) return
@@ -50,6 +49,9 @@ class NotificationService : NotificationListenerService() {
         if (message.isBlank()) return
 
         val normalizedMessage = message.replace(Regex("\\s+"), " ").trim()
+        val priorityContact = PreferencesStore.isPriorityContact(this, title)
+        val emergency = isEmergencyMessage(normalizedMessage)
+        if (PreferencesStore.isQuietNow(this) && !priorityContact && !emergency) return
         if (PreferencesStore.areSmartFiltersEnabled(this) && isLowValueNotification(normalizedMessage)) return
         val deduplicationKey = listOf(sbn.packageName, sbn.tag, title, normalizedMessage).joinToString("|")
         if (isDuplicate(deduplicationKey)) return
@@ -86,6 +88,12 @@ class NotificationService : NotificationListenerService() {
             lines,
             extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
         ).orEmpty()
+    }
+
+    private fun isEmergencyMessage(message: String): Boolean {
+        val normalized = message.lowercase()
+        return listOf("emergencia", "emergency", "ayuda", "auxilio", "llámame ya", "llamame ya")
+            .any(normalized::contains)
     }
 
     private fun isLowValueNotification(message: String): Boolean {

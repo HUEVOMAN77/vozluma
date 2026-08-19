@@ -22,6 +22,7 @@ object PreferencesStore {
     private const val KEY_THEME = "theme_mode"
     private const val KEY_SPEECH_RATE = "speech_rate"
     private const val KEY_APPS = "enabled_apps"
+    private const val KEY_PRIORITY_CONTACTS = "priority_contacts"
 
     val supportedPackages = linkedMapOf(
         "com.whatsapp" to "WhatsApp",
@@ -129,6 +130,20 @@ object PreferencesStore {
     fun isPackageEnabled(context: Context, packageName: String): Boolean {
         val stored = preferences(context).getStringSet(KEY_APPS, null)
         return stored?.contains(packageName) ?: supportedPackages.containsKey(packageName)
+    }
+
+    fun priorityContacts(context: Context): Set<String> =
+        preferences(context).getStringSet(KEY_PRIORITY_CONTACTS, emptySet()) ?: emptySet()
+
+    fun setPriorityContacts(context: Context, contacts: Set<String>) {
+        preferences(context).edit().putStringSet(KEY_PRIORITY_CONTACTS, contacts).apply()
+    }
+
+    fun isPriorityContact(context: Context, sender: String?): Boolean {
+        val normalizedSender = sender?.lowercase()?.trim().orEmpty()
+        return normalizedSender.isNotBlank() && priorityContacts(context).any {
+            normalizedSender.contains(it.lowercase().trim())
+        }
     }
 
     fun setPackageEnabled(context: Context, packageName: String, enabled: Boolean) {
