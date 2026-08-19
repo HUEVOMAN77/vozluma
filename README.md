@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma Premium 2.1.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 2.2.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -14,6 +14,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 |---|---|
 | Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español. |
 | Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
+| Música offline | Reproducir, pausar, detener, siguiente, anterior, abrir reproductor y subir/bajar volumen mediante MediaSession y teclas multimedia del sistema. |
 | Respuestas | Dictado local de un borrador, revisión, edición y selector de aplicación; nunca hay envío automático. |
 | Notificaciones | WhatsApp, Messenger, Facebook, Instagram, Mensajes de Google, SMS y Mensajes Samsung, con selección individual, deduplicación y filtros inteligentes. |
 | Prioridades | Contactos prioritarios que pueden superar el horario silencioso; alertas con palabras de emergencia también reciben tratamiento especial. |
@@ -23,6 +24,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Acceso rápido | Widget para pausar o activar la escucha cuando el micrófono ya tiene permiso. |
 | Conversación offline | Después de «Hola», mantiene una ventana de conversación de 20 segundos para varias preguntas sin repetir la activación. |
 | Personalización | Biblioteca para crear frases y respuestas personalizadas completamente locales. |
+| Control del sistema | Intents seguros para abrir ajustes, temporizadores, reproductor de música y otras funciones disponibles en el teléfono. |
 | Dashboard | Estado de permisos, estado de escucha, diagnóstico de voz, salud de batería, almacenamiento libre y estado del modelo offline. |
 
 ## Interfaz
@@ -72,7 +74,7 @@ Mientras el micrófono está activo, Android muestra una notificación permanent
 
 Los comandos que pueden producir efectos externos se mantienen deliberadamente seguros. La respuesta dictada se guarda como borrador local y requiere revisión explícita; el selector del sistema permite elegir la aplicación destino. El centro de privacidad permite borrar historial, contactos prioritarios y borradores. El usuario también puede abrir directamente los ajustes de permisos de Android.
 
-El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA.
+El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA. El control de música funciona cuando el reproductor tiene una sesión multimedia activa o acepta teclas multimedia del sistema; seleccionar una canción concreta depende de las capacidades de cada reproductor.
 
 ## Estructura principal
 

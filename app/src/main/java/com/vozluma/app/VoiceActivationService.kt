@@ -195,6 +195,30 @@ class VoiceActivationService : Service(), RecognitionListener {
                 normalized.contains("qué dispositivo tengo") || normalized.contains("que dispositivo tengo") -> deviceAnswer()
             normalized.contains("tengo internet") || normalized.contains("estoy conectado") ||
                 normalized.contains("hay conexión") || normalized.contains("hay conexion") -> connectivityAnswer()
+            normalized.contains("reproduc") || normalized.contains("pon música") || normalized.contains("pon musica") ->
+                MediaControlManager.play(this)
+            normalized.contains("pausa") || normalized.contains("pausar") -> MediaControlManager.pause(this)
+            normalized.contains("detén la música") || normalized.contains("deten la musica") ||
+                normalized.contains("detener música") || normalized.contains("detener musica") ->
+                MediaControlManager.stop(this)
+            normalized.contains("cambia la canción") || normalized.contains("cambia la cancion") ||
+                normalized.contains("siguiente canción") || normalized.contains("siguiente cancion") ||
+                normalized.contains("siguiente pista") || normalized == "siguiente" ->
+                MediaControlManager.next(this)
+            normalized.contains("canción anterior") || normalized.contains("cancion anterior") ||
+                normalized.contains("pista anterior") || normalized == "anterior" ->
+                MediaControlManager.previous(this)
+            normalized.contains("sube el volumen") || normalized.contains("subir el volumen") ||
+                normalized.contains("más volumen") || normalized.contains("mas volumen") ->
+                MediaControlManager.volume(this, increase = true)
+            normalized.contains("baja el volumen") || normalized.contains("bajar el volumen") ||
+                normalized.contains("menos volumen") ->
+                MediaControlManager.volume(this, increase = false)
+            normalized.contains("abre el reproductor") || normalized.contains("abre la música") ||
+                normalized.contains("abre la musica") -> {
+                MediaControlManager.openMusicApp(this)
+                "Abrí el reproductor de música"
+            }
             normalized.contains("silencia") || normalized.contains("modo silencio") -> {
                 PreferencesStore.setAssistantEnabled(this, false)
                 "Listo, silencié el asistente"
@@ -309,7 +333,7 @@ class VoiceActivationService : Service(), RecognitionListener {
     }
 
     private fun helpAnswer(): String =
-        "Puedo decirte la hora y la fecha, leer notificaciones, darte resúmenes, calcular, guardar recordatorios locales, crear temporizadores, abrir ajustes de sonido y Bluetooth, cambiar modos y responder a tus comandos personalizados"
+        "Puedo decirte la hora y la fecha, reproducir, pausar o cambiar canciones, controlar el volumen, leer notificaciones, darte resúmenes, calcular, guardar recordatorios locales, crear temporizadores, abrir ajustes y responder a tus comandos personalizados"
 
     private fun parseMinutes(text: String): Int? {
         Regex("\\d+").find(text)?.value?.toIntOrNull()?.let { return it }
