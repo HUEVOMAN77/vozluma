@@ -2,6 +2,8 @@
 
 **VozLuma Premium 3.2.0** es un asistente de voz para Android diseñado para funcionar localmente. Escucha la palabra **«Hola»**, responde **«Hola, ¿en qué puedo ayudarte?»** y ejecuta comandos útiles del teléfono mediante reconocimiento de voz offline, texto a voz y servicios nativos de Android.
 
+> **Descarga directa:** [descargar VozLuma-Suite-3.2.apk](https://github.com/HUEVOMAN77/vozluma/releases/download/v3.2.0/VozLuma-Suite-3.2.apk)
+>
 > **Privacidad primero:** el modelo de reconocimiento, el audio de activación, el historial, los borradores y las preferencias se procesan y almacenan localmente. La aplicación no requiere cuentas ni servidores propios.
 
 ## Capturas de la interfaz
@@ -28,7 +30,7 @@
 
 ## Instalación
 
-Descarga [`VozLuma-Suite-3.2.0.apk`](artifacts/VozLuma-Suite-3.2.0.apk) desde este repositorio e instálala en Android 8.0 o posterior. Si Android conserva una instalación anterior con la misma aplicación, actualiza sobre ella; si muestra conflicto de firma, desinstala primero la versión anterior y vuelve a instalar la APK.
+Descarga directamente [`VozLuma-Suite-3.2.apk`](https://github.com/HUEVOMAN77/vozluma/releases/download/v3.2.0/VozLuma-Suite-3.2.apk) desde el Release público de GitHub e instálala en Android 8.0 o posterior. Si Android conserva una instalación anterior con la misma aplicación, actualiza sobre ella; si muestra conflicto de firma, desinstala primero la versión anterior y vuelve a instalar la APK.
 
 Abre la aplicación y pulsa **Instalar modelo español**. El modelo está incluido en la APK, por lo que esta instalación no depende de que el teléfono pueda descargar un archivo externo. Cuando aparezca **Modelo instalado**, concede el permiso de micrófono, activa **Asistente activo** y habilita **Activación por voz: «Hola»**. Para leer notificaciones, concede también el acceso a notificaciones desde el botón correspondiente.
 
