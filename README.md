@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma Premium 2.0.3** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 2.1.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -13,7 +13,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Área | Funciones |
 |---|---|
 | Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español. |
-| Comandos | Hora, resumen de notificaciones, última notificación, estado, activar/desactivar asistente, modo coche, temporizadores, ajustes de sonido y Bluetooth, y ayuda. |
+| Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
 | Respuestas | Dictado local de un borrador, revisión, edición y selector de aplicación; nunca hay envío automático. |
 | Notificaciones | WhatsApp, Messenger, Facebook, Instagram, Mensajes de Google, SMS y Mensajes Samsung, con selección individual, deduplicación y filtros inteligentes. |
 | Prioridades | Contactos prioritarios que pueden superar el horario silencioso; alertas con palabras de emergencia también reciben tratamiento especial. |
@@ -21,7 +21,9 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Perfiles y modos | Horario silencioso, modo coche, solo auriculares/Bluetooth, tema oscuro y velocidad de voz ajustable. |
 | Privacidad | Centro de privacidad, historial local opcional, borrado de datos locales, permisos visibles y procesamiento offline. |
 | Acceso rápido | Widget para pausar o activar la escucha cuando el micrófono ya tiene permiso. |
-| Dashboard | Estado de permisos, estado de escucha, salud de batería, almacenamiento libre y estado del modelo offline. |
+| Conversación offline | Después de «Hola», mantiene una ventana de conversación de 20 segundos para varias preguntas sin repetir la activación. |
+| Personalización | Biblioteca para crear frases y respuestas personalizadas completamente locales. |
+| Dashboard | Estado de permisos, estado de escucha, diagnóstico de voz, salud de batería, almacenamiento libre y estado del modelo offline. |
 
 ## Interfaz
 
@@ -54,7 +56,7 @@ Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. T
 ./gradlew assembleDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Install-Fix-2.0.2.apk`.
+El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Offline-2.1.0.apk`.
 
 Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
 
@@ -70,7 +72,7 @@ Mientras el micrófono está activo, Android muestra una notificación permanent
 
 Los comandos que pueden producir efectos externos se mantienen deliberadamente seguros. La respuesta dictada se guarda como borrador local y requiere revisión explícita; el selector del sistema permite elegir la aplicación destino. El centro de privacidad permite borrar historial, contactos prioritarios y borradores. El usuario también puede abrir directamente los ajustes de permisos de Android.
 
-El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado».
+El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA.
 
 ## Estructura principal
 

@@ -31,7 +31,9 @@ class PrivacyActivity : AppCompatActivity() {
                 .setPositiveButton(R.string.clear_all_local_data) { _, _ ->
                     HistoryStore.clear(this)
                     ReplyDraftStore.clear(this)
+                    CustomCommandStore.deleteAll(this)
                     PreferencesStore.setPriorityContacts(this, emptySet())
+                    PreferencesStore.clearLastReminder(this)
                     findViewById<TextView>(R.id.text_privacy_action_status)
                         .setText(R.string.privacy_data_cleared)
                 }

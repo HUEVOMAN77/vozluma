@@ -33,6 +33,7 @@ class VoiceActivationService : Service(), RecognitionListener {
     private val handler = Handler(Looper.getMainLooper())
     private var waitingForCommand = false
     private var waitingForReply = false
+    private var conversationMode = false
     private var shuttingDown = false
 
     override fun onCreate() {
@@ -83,7 +84,7 @@ class VoiceActivationService : Service(), RecognitionListener {
         VoiceDiagnosticsStore.set(this, "resultado", text)
         if (!waitingForCommand && containsWakeWord(text)) {
             beginConversation()
-        } else if (waitingForCommand && text.isNotBlank()) {
+        } else if ((waitingForCommand || conversationMode) && text.isNotBlank()) {
             handleCommand(text)
         }
     }
@@ -143,9 +144,12 @@ class VoiceActivationService : Service(), RecognitionListener {
     private fun beginConversation() {
         if (waitingForCommand || shuttingDown) return
         waitingForCommand = true
+        conversationMode = true
         stopListening()
+        handler.removeCallbacksAndMessages(null)
         VoiceDiagnosticsStore.set(this, "Hola detectado", "respondiendo")
         ttsManager.speak("Hola, ¿en qué puedo ayudarte?")
+        handler.postDelayed({ conversationMode = false }, CONVERSATION_TIMEOUT_MS)
         restartListeningWithDelay(GREETING_DELAY_MS)
     }
 
@@ -163,7 +167,15 @@ class VoiceActivationService : Service(), RecognitionListener {
             restartListeningWithDelay(COMMAND_DELAY_MS)
             return
         }
-        val answer = when {
+        val answer = CustomCommandStore.match(this, normalized) ?: when {
+            normalized.startsWith("hola") || normalized.contains("buenos días") || normalized.contains("buenos dias") ||
+                normalized.contains("buenas tardes") || normalized.contains("buenas noches") ->
+                "Hola de nuevo. Estoy lista para ayudarte"
+            normalized.contains("gracias") || normalized.contains("muchas gracias") ->
+                "De nada. Estoy aquí para ayudarte"
+            normalized.contains("quién eres") || normalized.contains("quien eres") || normalized.contains("qué eres") ||
+                normalized.contains("que eres") ->
+                "Soy VozLuma, tu asistente local. Puedo ayudarte con comandos, notificaciones, llamadas y tareas del teléfono"
             normalized.contains("resumen") || normalized.contains("cuántas notificaciones") ||
                 normalized.contains("cuantas notificaciones") -> HistoryStore.summary(this)
             normalized.contains("responder") || normalized.contains("contestar") -> {
@@ -175,6 +187,14 @@ class VoiceActivationService : Service(), RecognitionListener {
                 latestNotificationAnswer()
             normalized.contains("qué hora es") || normalized.contains("que hora es") ->
                 "Son las ${java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())}"
+            normalized.contains("cómo estás") || normalized.contains("como estas") ->
+                "Estoy funcionando y lista para ayudarte"
+            normalized.contains("batería") || normalized.contains("bateria") -> batteryAnswer()
+            normalized.contains("espacio libre") || normalized.contains("almacenamiento") -> storageAnswer()
+            normalized.contains("qué teléfono tengo") || normalized.contains("que telefono tengo") ||
+                normalized.contains("qué dispositivo tengo") || normalized.contains("que dispositivo tengo") -> deviceAnswer()
+            normalized.contains("tengo internet") || normalized.contains("estoy conectado") ||
+                normalized.contains("hay conexión") || normalized.contains("hay conexion") -> connectivityAnswer()
             normalized.contains("silencia") || normalized.contains("modo silencio") -> {
                 PreferencesStore.setAssistantEnabled(this, false)
                 "Listo, silencié el asistente"
@@ -215,13 +235,81 @@ class VoiceActivationService : Service(), RecognitionListener {
             normalized.contains("estado") -> {
                 if (PreferencesStore.isAssistantEnabled(this)) "El asistente está encendido" else "El asistente está apagado"
             }
-            normalized.contains("qué puedes hacer") || normalized.contains("que puedes hacer") ->
-                "Puedo anunciar tus notificaciones y llamadas, leer la última notificación y activar o desactivar el asistente"
-            else -> "Todavía estoy aprendiendo. Puedo ayudarte con tus notificaciones, llamadas y ajustes de voz"
+            normalized.contains("cuánto es") || normalized.contains("cuanto es") || normalized.contains("calcula") ||
+                normalized.contains("calcular") -> calculateAnswer(normalized)
+            normalized.contains("qué día es") || normalized.contains("que dia es") ||
+                normalized.contains("qué fecha es") || normalized.contains("que fecha es") ->
+                dateAnswer()
+            normalized.contains("recordatorio") || normalized.contains("recuérdame") || normalized.contains("recuerdame") -> {
+                PreferencesStore.setLastReminder(this, command)
+                "Guardé este recordatorio en VozLuma: ${command.substringAfter("recordatorio", command).trim()}"
+            }
+            normalized.contains("borra el recordatorio") || normalized.contains("elimina el recordatorio") -> {
+                PreferencesStore.clearLastReminder(this)
+                "Eliminé el recordatorio local"
+            }
+            normalized.contains("qué tengo pendiente") || normalized.contains("que tengo pendiente") ||
+                normalized.contains("mis recordatorios") -> PreferencesStore.lastReminder(this)
+            normalized.contains("qué puedes hacer") || normalized.contains("que puedes hacer") ||
+                normalized.contains("ayuda") || normalized.contains("comandos") -> helpAnswer()
+            else -> "No tengo una respuesta general sin Internet, pero sí puedo ayudarte offline con comandos, notificaciones, llamadas, cálculos, recordatorios, temporizadores, ajustes y frases personalizadas. Di ayuda para escuchar la lista"
         }
         ttsManager.speak(answer)
         restartListeningWithDelay(COMMAND_DELAY_MS)
     }
+
+    private fun calculateAnswer(text: String): String {
+        val expression = text.substringAfter("cuánto es", text.substringAfter("cuanto es", text.substringAfter("calcula", text.substringAfter("calcular", ""))))
+            .replace("por", "*")
+            .replace("x", "*")
+            .replace("más", "+")
+            .replace("mas", "+")
+            .replace("menos", "-")
+            .replace("dividido entre", "/")
+            .replace("dividido por", "/")
+            .replace(Regex("[^0-9+*/.\\-]"), "")
+        return runCatching {
+            val numbers = Regex("(-?\\d+(?:\\.\\d+)?)").findAll(expression).map { it.value.toDouble() }.toList()
+            val operator = Regex("[+*/-]").find(expression)?.value
+            if (numbers.size < 2 || operator == null) return@runCatching "Puedo calcular operaciones sencillas como 12 más 8"
+            val result = when (operator) {
+                "+" -> numbers[0] + numbers[1]
+                "-" -> numbers[0] - numbers[1]
+                "*" -> numbers[0] * numbers[1]
+                "/" -> if (numbers[1] == 0.0) return@runCatching "No se puede dividir por cero" else numbers[0] / numbers[1]
+                else -> return@runCatching "Puedo calcular operaciones sencillas"
+            }
+            "El resultado es ${"%.2f".format(java.util.Locale.getDefault(), result).trimEnd('0').trimEnd('.') }"
+        }.getOrElse { "Puedo calcular operaciones sencillas como 12 más 8" }
+    }
+
+    private fun dateAnswer(): String =
+        "Hoy es ${java.text.SimpleDateFormat("EEEE d 'de' MMMM", java.util.Locale("es", "ES")).format(java.util.Date())}"
+
+    private fun batteryAnswer(): String {
+        val manager = getSystemService(android.os.BatteryManager::class.java)
+        val percentage = manager?.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            ?.takeIf { it in 0..100 } ?: return "No pude consultar la batería"
+        return "La batería está al $percentage por ciento"
+    }
+
+    private fun storageAnswer(): String {
+        val stats = android.os.StatFs(filesDir.absolutePath)
+        val freeGb = stats.availableBytes / (1024L * 1024L * 1024L)
+        return "Tienes aproximadamente $freeGb gigabytes libres"
+    }
+
+    private fun deviceAnswer(): String =
+        "Estás usando un ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
+
+    private fun connectivityAnswer(): String {
+        val manager = getSystemService(android.net.ConnectivityManager::class.java)
+        val connected = manager?.activeNetwork != null
+        return if (connected) "El teléfono indica que tiene una conexión activa" else "No detecto una conexión activa"
+    }
+
+    private fun helpAnswer(): String =
+        "Puedo decirte la hora y la fecha, leer notificaciones, darte resúmenes, calcular, guardar recordatorios locales, crear temporizadores, abrir ajustes de sonido y Bluetooth, cambiar modos y responder a tus comandos personalizados"
 
     private fun parseMinutes(text: String): Int? {
         Regex("\\d+").find(text)?.value?.toIntOrNull()?.let { return it }
@@ -311,5 +399,6 @@ class VoiceActivationService : Service(), RecognitionListener {
         private const val WAKE_WORD = "hola"
         private const val GREETING_DELAY_MS = 1_800L
         private const val COMMAND_DELAY_MS = 3_000L
+        private const val CONVERSATION_TIMEOUT_MS = 20_000L
     }
 }

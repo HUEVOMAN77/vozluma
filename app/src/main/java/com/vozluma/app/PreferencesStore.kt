@@ -23,6 +23,7 @@ object PreferencesStore {
     private const val KEY_SPEECH_RATE = "speech_rate"
     private const val KEY_APPS = "enabled_apps"
     private const val KEY_PRIORITY_CONTACTS = "priority_contacts"
+    private const val KEY_LAST_REMINDER = "last_reminder"
 
     val supportedPackages = linkedMapOf(
         "com.whatsapp" to "WhatsApp",
@@ -137,6 +138,19 @@ object PreferencesStore {
 
     fun setPriorityContacts(context: Context, contacts: Set<String>) {
         preferences(context).edit().putStringSet(KEY_PRIORITY_CONTACTS, contacts).apply()
+    }
+
+    fun setLastReminder(context: Context, reminder: String) {
+        preferences(context).edit().putString(KEY_LAST_REMINDER, reminder.trim()).apply()
+    }
+
+    fun lastReminder(context: Context): String =
+        preferences(context).getString(KEY_LAST_REMINDER, null)?.takeIf { it.isNotBlank() }
+            ?.let { "Tu recordatorio es: $it" }
+            ?: "No tienes recordatorios locales"
+
+    fun clearLastReminder(context: Context) {
+        preferences(context).edit().remove(KEY_LAST_REMINDER).apply()
     }
 
     fun isPriorityContact(context: Context, sender: String?): Boolean {
