@@ -1,123 +1,92 @@
 # VozLuma Premium
 
-**VozLuma Premium 3.2.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 3.2.0** es un asistente de voz para Android diseñado para funcionar localmente. Escucha la palabra **«Hola»**, responde **«Hola, ¿en qué puedo ayudarte?»** y ejecuta comandos útiles del teléfono mediante reconocimiento de voz offline, texto a voz y servicios nativos de Android.
 
-## Experiencia principal
+> **Privacidad primero:** el modelo de reconocimiento, el audio de activación, el historial, los borradores y las preferencias se procesan y almacenan localmente. La aplicación no requiere cuentas ni servidores propios.
 
-Di **«Hola»** mientras la activación por voz está encendida. VozLuma responderá **«Hola, ¿en qué puedo ayudarte?»** y escuchará una orden breve. Esta edición incluye el modelo español ligero de Vosk dentro de la APK y lo instala en el almacenamiento privado la primera vez. No se requiere una cuenta de VozLuma ni una conexión a Internet durante la escucha.
+## Capturas de la interfaz
 
-La edición premium mantiene una separación segura entre comandos informativos y acciones sensibles. Puede preparar un borrador de respuesta dictada, pero no envía mensajes automáticamente: muestra una pantalla de revisión y el usuario decide si quiere editarlo y compartirlo mediante una aplicación del teléfono.
+![Dashboard de VozLuma con el modelo español offline](docs/screenshots/dashboard-modelo.jpg)
 
-## Funciones premium
+![Centro de control y aplicaciones configurables](docs/screenshots/dashboard-aplicaciones.jpg)
 
-| Área | Funciones |
+## Funciones principales
+
+| Área | Capacidades destacadas |
 |---|---|
-| Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español; el modelo viene integrado en la APK. |
-| Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
-| Música offline | Reproducir, pausar, detener, siguiente, anterior, abrir reproductor y subir/bajar volumen mediante MediaSession y teclas multimedia del sistema. |
-| Suite de teléfono | Llamadas con marcador y confirmación, SMS preparados para revisar, cámara, mapas, alarmas y calendario con fallback seguro, además de ajustes. |
-| Accesibilidad | Lectura de pantalla y acciones globales opcionales, siempre activadas manualmente por el usuario. |
-| Rutinas | Modo dormir, estudio, trabajo, viaje, coche, casa y normal con preferencias locales. |
-| Respuestas | Dictado local de un borrador, revisión, edición y selector de aplicación; nunca hay envío automático. |
-| Notificaciones | WhatsApp, Messenger, Facebook, Instagram, Mensajes de Google, SMS y Mensajes Samsung, con selección individual, deduplicación y filtros inteligentes. |
-| Prioridades | Contactos prioritarios que pueden superar el horario silencioso; alertas con palabras de emergencia también reciben tratamiento especial. |
-| Llamadas | Anuncia el nombre del contacto cuando existe permiso y el número disponible cuando no hay coincidencia. |
-| Perfiles y modos | Horario silencioso, modo coche, solo auriculares/Bluetooth, tema oscuro y velocidad de voz ajustable. |
-| Privacidad | Centro de privacidad, historial local opcional, borrado de datos locales, permisos visibles y procesamiento offline. |
-| Acceso rápido | Widget para pausar o activar la escucha cuando el micrófono ya tiene permiso. |
-| Conversación offline | Después de «Hola», mantiene una ventana de conversación de 20 segundos para varias preguntas sin repetir la activación. |
-| Personalización | Biblioteca para crear frases y respuestas personalizadas completamente locales. |
-| Control del sistema | Intents protegidos contra errores para abrir ajustes, temporizadores, reproductor de música y otras funciones disponibles en el teléfono. |
-| Dashboard | Estado de permisos, estado de escucha, diagnóstico de voz, salud de batería, almacenamiento libre y estado del modelo offline. |
+| Activación offline | Detección local de «Hola» con Vosk, respuesta inicial hablada y ventana de conversación de 20 segundos. El modelo español viene integrado en la APK y se instala localmente. |
+| Música y multimedia | Reproducir, pausar, detener, cambiar a la siguiente o anterior canción, abrir el reproductor y subir o bajar el volumen mediante sesiones multimedia y controles del sistema. |
+| Llamadas seguras | Busca contactos, abre el marcador y exige confirmación antes de realizar una llamada. También anuncia llamadas entrantes con el nombre del contacto cuando existe permiso. |
+| Mensajes seguros | Prepara SMS y respuestas dictadas como borradores revisables. Nunca envía un mensaje automáticamente. |
+| Teléfono | Abre cámara, mapas, calendario, ajustes de sonido, Bluetooth y otros paneles nativos disponibles en el dispositivo. |
+| Alarmas y temporizadores | Prepara alarmas y temporizadores en el reloj del sistema. Si el fabricante no permite el intent, abre un fallback seguro o informa por voz sin cerrar la aplicación. |
+| Notificaciones | Lee notificaciones seleccionadas de WhatsApp, Messenger, Facebook, Instagram, Mensajes de Google, SMS y Mensajes Samsung. Incluye filtros inteligentes, deduplicación, horario silencioso y contactos prioritarios. |
+| Rutinas | Modos dormir, estudio, trabajo, viaje, coche, casa y normal, guardados localmente. |
+| Accesibilidad opcional | Lee la pantalla y ejecuta acciones globales como volver, inicio y notificaciones. Solo funciona después de que el usuario active manualmente el servicio en Ajustes de Android. |
+| Personalización | Comandos personalizados, contactos prioritarios, velocidad de voz, tema oscuro, historial local, modo auriculares/Bluetooth y widget de control rápido. |
+| Privacidad | Centro de privacidad para revisar permisos y borrar historial, borradores, recordatorios, comandos personalizados y contactos prioritarios. |
 
-## Interfaz
+## Instalación
 
-La interfaz fue rediseñada con Material 3, tarjetas redondeadas, jerarquía visual, gradientes azul-violeta-cian, estados de escucha visibles, modo oscuro y adaptación edge-to-edge. Los controles importantes tienen texto y no dependen únicamente del color, para conservar legibilidad y accesibilidad. Android 15 aplica edge-to-edge automáticamente cuando una aplicación apunta a SDK 35, por lo que VozLuma aplica insets a su contenido desplazable [1].
+Descarga [`VozLuma-Suite-3.2.0.apk`](artifacts/VozLuma-Suite-3.2.0.apk) desde este repositorio e instálala en Android 8.0 o posterior. Si Android conserva una instalación anterior con la misma aplicación, actualiza sobre ella; si muestra conflicto de firma, desinstala primero la versión anterior y vuelve a instalar la APK.
 
-## Modelo local
+Abre la aplicación y pulsa **Instalar modelo español**. El modelo está incluido en la APK, por lo que esta instalación no depende de que el teléfono pueda descargar un archivo externo. Cuando aparezca **Modelo instalado**, concede el permiso de micrófono, activa **Asistente activo** y habilita **Activación por voz: «Hola»**. Para leer notificaciones, concede también el acceso a notificaciones desde el botón correspondiente.
 
-La APK incluye `vosk-model-small-es-0.42` y lo copia una sola vez al almacenamiento privado desde la tarjeta **Modelo de voz offline**. El catálogo oficial de Vosk lo describe como un modelo español ligero para Android y Raspberry Pi, con un tamaño comprimido aproximado de 39 MB [2]. Después de la instalación, el reconocimiento funciona sin Internet; la APK final ocupa aproximadamente 83 MB.
+La escucha se mantiene visible mediante una notificación permanente del sistema. Esto permite saber cuándo el micrófono está activo y respeta las restricciones de Android para servicios de primer plano que utilizan el micrófono [2].
 
-## Requisitos
+## Seguridad de las acciones
 
-| Componente | Versión |
+Las acciones sensibles están diseñadas para evitar ejecuciones accidentales. Las llamadas abren el marcador para confirmar, los SMS se preparan como borradores y los eventos, alarmas y temporizadores se abren en sus aplicaciones del sistema para que el usuario los revise. Las rutas de cámara, mapas, calendario, reloj, ajustes y compartir están protegidas contra actividades no disponibles: VozLuma responde con un mensaje en vez de cerrarse.
+
+La accesibilidad es deliberadamente visible y manual. VozLuma no activa ese servicio de forma oculta ni utiliza una cuenta externa. Android reserva los servicios de accesibilidad para funciones de asistencia que el usuario habilita explícitamente [3].
+
+## Requisitos técnicos
+
+| Componente | Valor |
 |---|---|
-| Android Studio | Hedgehog o posterior |
-| JDK | 17 |
-| Android Gradle Plugin | 8.6.1 |
-| Kotlin | 2.0.21 |
-| Vosk Android | 0.3.75 |
-| Compile SDK | 35 |
-| Android mínimo | API 26 / Android 8.0 |
-| Application ID | `com.vozluma.premium` |
-| Modelo inicial | Incluido en la APK; instalación local sin Internet |
-| Diagnóstico | Estado visible de modelo, micrófono, escucha y detección de «Hola» |
+| Plataforma | Android 8.0 o posterior, API 26+ |
+| SDK objetivo | Android SDK 35 |
+| Lenguaje | Kotlin |
+| Reconocimiento | Vosk Android 0.3.75 con `vosk-model-small-es-0.42` |
+| Texto a voz | Motor nativo Android en español |
+| Identificador | `com.vozluma.premium` |
+| Versión | 3.2.0, versionCode 11 |
 
 ## Compilación
 
-Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. También puedes generar el APK de depuración con:
-
 ```bash
-./gradlew assembleDebug
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export ANDROID_HOME=/home/ubuntu/android-sdk
+./gradlew clean assembleDebug
+./gradlew lintDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.2.0.apk`.
+El APK generado queda en `app/build/outputs/apk/debug/app-debug.apk`. La edición publicada se encuentra en `artifacts/VozLuma-Suite-3.2.0.apk`.
 
-Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
-
-## Configuración inicial
-
-Instala el APK y concede teléfono/contactos cuando Android lo solicite. Abre VozLuma y pulsa **Instalar modelo español**; el modelo se copia desde la propia APK, sin depender de Internet. Espera a que aparezca **Modelo instalado**. Después abre **Conceder acceso a notificaciones**, activa VozLuma en los ajustes del sistema y confirma el aviso. Activa **Asistente activo**, habilita **Activación por voz: «Hola»** y concede el permiso de micrófono. El botón **Probar la voz** inicia una prueba guiada y te indica cuándo decir «Hola».
-
-Mientras el micrófono está activo, Android muestra una notificación permanente de servicio. Esto es deliberado: permite al usuario saber que la aplicación está escuchando. Android impone requisitos de tipo y permisos para servicios de primer plano que usan micrófono, y puede restringir el inicio de ese servicio desde segundo plano [3]. Por eso algunos fabricantes pueden detener la escucha tras reiniciar o aplicar ahorro de batería; si ocurre, abre la aplicación y vuelve a activar el interruptor.
-
-## Privacidad y seguridad
-
-> VozLuma no envía tus notificaciones, llamadas, contactos, borradores ni audio a un servidor de VozLuma.
-
-Los comandos que pueden producir efectos externos se mantienen deliberadamente seguros. La respuesta dictada se guarda como borrador local y requiere revisión explícita; el selector del sistema permite elegir la aplicación destino. El centro de privacidad permite borrar historial, contactos prioritarios y borradores. El usuario también puede abrir directamente los ajustes de permisos de Android.
-
-El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA. El control de música funciona cuando el reproductor tiene una sesión multimedia activa o acepta teclas multimedia del sistema; seleccionar una canción concreta depende de las capacidades de cada reproductor. El control de pantalla requiere activar manualmente el servicio de accesibilidad desde Ajustes; Android reserva ese mecanismo para herramientas de asistencia general [4].
-
-## Estructura principal
+## Estructura relevante
 
 ```text
 app/src/main/
-├── AndroidManifest.xml
-├── assets/vosk-model-small-es-0.42.zip   # Modelo español integrado
-├── filesDir/model-es/                    # Modelo instalado en el dispositivo
-├── drawable/ic_vozluma.xml               # Icono moderno oficial
+├── assets/vosk-model-small-es-0.42.zip
 ├── java/com/vozluma/app/
-│   ├── AudioRouteChecker.kt
-│   ├── CustomCommandStore.kt
-│   ├── CustomCommandsActivity.kt
-│   ├── BootReceiver.kt
-│   ├── HistoryActivity.kt
-│   ├── HistoryStore.kt
-│   ├── IncomingCallReceiver.kt
 │   ├── MainActivity.kt
+│   ├── ModelManager.kt
+│   ├── VoiceActivationService.kt
 │   ├── MediaControlManager.kt
 │   ├── NotificationService.kt
-│   ├── PreferencesStore.kt
-│   ├── PriorityContactsActivity.kt
-│   ├── PrivacyActivity.kt
-│   ├── ReplyDraftActivity.kt
-│   ├── ReplyDraftStore.kt
-│   ├── TTSManager.kt
-│   ├── VoiceActivationService.kt
+│   ├── IncomingCallReceiver.kt
 │   ├── VozLumaAccessibilityService.kt
-│   └── VozLumaWidgetProvider.kt
+│   ├── CustomCommandsActivity.kt
+│   └── PrivacyActivity.kt
 └── res/
-    ├── drawable/
-    ├── layout/
-    ├── values/
-    ├── values-night/
-    └── xml/vozluma_widget_info.xml
+    ├── drawable/ic_vozluma.xml
+    └── layout/activity_main.xml
 ```
 
-## Referencias
+## Licencia y referencias
 
-[1]: https://developer.android.com/develop/ui/views/layout/edge-to-edge "Display content edge-to-edge in views — Android Developers"
-[2]: https://alphacephei.com/vosk/models "Vosk Models"
-[3]: https://developer.android.com/develop/background-work/services/fgs/service-types "Foreground service types — Android Developers"
-[4]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"
+Este repositorio contiene el código y los artefactos de VozLuma Premium. El modelo de voz se distribuye conforme a las condiciones del proyecto Vosk y se obtiene del catálogo oficial [1].
+
+[1]: https://alphacephei.com/vosk/models "Vosk Models"
+[2]: https://developer.android.com/develop/background-work/services/fgs/service-types "Foreground service types — Android Developers"
+[3]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"
