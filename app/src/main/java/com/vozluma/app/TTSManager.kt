@@ -13,6 +13,7 @@ class TTSManager(context: Context) : TextToSpeech.OnInitListener {
     private val appContext = context.applicationContext
     private var textToSpeech: TextToSpeech? = TextToSpeech(appContext, this)
     private var isReady = false
+    private var pendingSpeech: String? = null
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
@@ -29,17 +30,28 @@ class TTSManager(context: Context) : TextToSpeech.OnInitListener {
                 override fun onDone(utteranceId: String?) = Unit
                 override fun onError(utteranceId: String?) = Unit
             })
+            pendingSpeech?.let { queued ->
+                pendingSpeech = null
+                speakNow(queued)
+            }
         }
     }
 
     @Synchronized
     fun speak(text: String) {
         val cleanText = text.trim()
-        if (!isReady || cleanText.isEmpty()) return
+        if (cleanText.isEmpty()) return
+        if (!isReady) {
+            pendingSpeech = cleanText
+            return
+        }
+        speakNow(cleanText)
+    }
 
+    private fun speakNow(text: String) {
         textToSpeech?.setSpeechRate(PreferencesStore.speechRate(appContext))
         textToSpeech?.speak(
-            cleanText,
+            text,
             TextToSpeech.QUEUE_FLUSH,
             null,
             "vozluma_${System.currentTimeMillis()}"

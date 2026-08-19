@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma Premium 2.0.2** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 2.0.3** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -44,6 +44,7 @@ La app descarga una sola vez `vosk-model-small-es-0.42` desde la tarjeta **Model
 | Android mínimo | API 26 / Android 8.0 |
 | Application ID | `com.vozluma.premium` |
 | Modelo inicial | Descarga única desde la app; Internet solo durante la configuración |
+| Diagnóstico | Estado visible de modelo, micrófono, escucha y detección de «Hola» |
 
 ## Compilación
 
@@ -59,7 +60,7 @@ Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos 
 
 ## Configuración inicial
 
-Instala el APK y concede teléfono/contactos cuando Android lo solicite. Abre VozLuma con Internet disponible y pulsa **Descargar modelo español**. Espera a que aparezca **Modelo instalado**. Después abre **Conceder acceso a notificaciones**, activa VozLuma en los ajustes del sistema y confirma el aviso. Activa **Asistente activo**, habilita **Activación por voz: «Hola»** y concede el permiso de micrófono.
+Instala el APK y concede teléfono/contactos cuando Android lo solicite. Abre VozLuma con Internet disponible y pulsa **Descargar modelo español**. Espera a que aparezca **Modelo instalado**. Después abre **Conceder acceso a notificaciones**, activa VozLuma en los ajustes del sistema y confirma el aviso. Activa **Asistente activo**, habilita **Activación por voz: «Hola»** y concede el permiso de micrófono. El botón **Probar la voz** inicia una prueba guiada y te indica cuándo decir «Hola».
 
 Mientras el micrófono está activo, Android muestra una notificación permanente de servicio. Esto es deliberado: permite al usuario saber que la aplicación está escuchando. Android impone requisitos de tipo y permisos para servicios de primer plano que usan micrófono, y puede restringir el inicio de ese servicio desde segundo plano [3]. Por eso algunos fabricantes pueden detener la escucha tras reiniciar o aplicar ahorro de batería; si ocurre, abre la aplicación y vuelve a activar el interruptor.
 
@@ -69,7 +70,7 @@ Mientras el micrófono está activo, Android muestra una notificación permanent
 
 Los comandos que pueden producir efectos externos se mantienen deliberadamente seguros. La respuesta dictada se guarda como borrador local y requiere revisión explícita; el selector del sistema permite elegir la aplicación destino. El centro de privacidad permite borrar historial, contactos prioritarios y borradores. El usuario también puede abrir directamente los ajustes de permisos de Android.
 
-El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio.
+El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado».
 
 ## Estructura principal
 

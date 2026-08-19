@@ -236,10 +236,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
         }
         findViewById<Button>(R.id.button_test_voice).setOnClickListener {
-            if (!assistantSwitch.isChecked) {
-                ttsManager.speak("Activa primero el asistente VozLuma")
-            } else {
-                ttsManager.speak("Hola. VozLuma está funcionando correctamente")
+            when {
+                !assistantSwitch.isChecked -> ttsManager.speak("Activa primero el asistente VozLuma")
+                !ModelManager.isReady(this) -> {
+                    ttsManager.speak("Descarga primero el modelo español")
+                    downloadModel()
+                }
+                !voiceActivationSwitch.isChecked -> {
+                    voiceActivationSwitch.isChecked = true
+                    Toast.makeText(this, R.string.voice_test_prompt, Toast.LENGTH_LONG).show()
+                }
+                else -> {
+                    startVoiceActivationService()
+                    Toast.makeText(this, R.string.voice_test_prompt, Toast.LENGTH_LONG).show()
+                }
             }
         }
         findViewById<Button>(R.id.button_history).setOnClickListener {
@@ -309,7 +319,9 @@ class MainActivity : AppCompatActivity() {
         val voiceState = if (PreferencesStore.isVoiceActivationEnabled(this)) {
             getString(R.string.status_voice_on)
         } else getString(R.string.status_voice_off)
-        accessStatusText.text = "$assistantState\n$accessState\n$voiceState"
+        val modelState = if (ModelManager.isReady(this)) "modelo instalado" else "modelo pendiente"
+        val diagnostics = VoiceDiagnosticsStore.message(this)
+        accessStatusText.text = "$assistantState\n$accessState\n$voiceState\n$modelState\n${getString(R.string.voice_diagnostics, diagnostics)}"
     }
 
     private fun updateDeviceInsights() {

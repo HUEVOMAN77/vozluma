@@ -16,6 +16,7 @@
     <string name="model_ready">Modelo instalado. VozLuma puede funcionar sin Internet.</string>
     <string name="model_downloading">Descargando modelo: %1$d%%</string>
     <string name="model_download_error">No se pudo descargar el modelo. Revisa Internet e inténtalo de nuevo.</string>
+    <string name="voice_test_prompt">Di «Hola» ahora. VozLuma debería responder en unos segundos.</string>
     <string name="assistant_switch">Asistente activo</string>
     <string name="voice_activation_switch">Activación por voz: «Hola»</string>
     <string name="permissions_title">Configuración rápida</string>
@@ -31,6 +32,7 @@
     <string name="status_access_missing">Falta conceder el acceso a notificaciones</string>
     <string name="status_voice_on">Activación por voz encendida</string>
     <string name="status_voice_off">Activación por voz apagada</string>
+    <string name="voice_diagnostics">Diagnóstico de voz: %1$s</string>
     <string name="apps_title">Aplicaciones que puede leer</string>
     <string name="apps_description">Elige qué aplicaciones tienen permiso para ser anunciadas.</string>
     <string name="open_priority_contacts">Configurar contactos prioritarios</string>

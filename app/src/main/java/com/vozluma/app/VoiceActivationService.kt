@@ -38,13 +38,20 @@ class VoiceActivationService : Service(), RecognitionListener {
     override fun onCreate() {
         super.onCreate()
         ttsManager = TTSManager(this)
+        VoiceDiagnosticsStore.set(this, "iniciando")
         createNotificationChannel()
         startMicrophoneForegroundNotification()
         loadLocalModel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!PreferencesStore.isVoiceActivationEnabled(this) || !hasRecordAudioPermission()) {
+        if (!PreferencesStore.isVoiceActivationEnabled(this)) {
+            VoiceDiagnosticsStore.set(this, "apagado", "activa el interruptor de voz")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        if (!hasRecordAudioPermission()) {
+            VoiceDiagnosticsStore.set(this, "sin permiso", "falta micrófono")
             stopSelf()
             return START_NOT_STICKY
         }
@@ -65,6 +72,7 @@ class VoiceActivationService : Service(), RecognitionListener {
 
     override fun onPartialResult(hypothesis: String?) {
         val text = extractText(hypothesis, "partial") ?: return
+        VoiceDiagnosticsStore.set(this, "escuchando", text)
         if (!waitingForCommand && containsWakeWord(text)) {
             beginConversation()
         }
@@ -72,6 +80,7 @@ class VoiceActivationService : Service(), RecognitionListener {
 
     override fun onResult(hypothesis: String?) {
         val text = extractText(hypothesis, "text") ?: return
+        VoiceDiagnosticsStore.set(this, "resultado", text)
         if (!waitingForCommand && containsWakeWord(text)) {
             beginConversation()
         } else if (waitingForCommand && text.isNotBlank()) {
@@ -85,6 +94,7 @@ class VoiceActivationService : Service(), RecognitionListener {
 
     override fun onError(exception: Exception?) {
         if (shuttingDown) return
+        VoiceDiagnosticsStore.set(this, "error de escucha", exception?.message ?: "reiniciando")
         restartListeningWithDelay(1_000L)
     }
 
@@ -95,14 +105,17 @@ class VoiceActivationService : Service(), RecognitionListener {
 
     private fun loadLocalModel() {
         if (!ModelManager.isReady(this)) {
+            VoiceDiagnosticsStore.set(this, "modelo pendiente", "descárgalo desde la pantalla principal")
             ttsManager.speak("Primero descarga el modelo de voz desde la pantalla principal")
             stopSelf()
             return
         }
         try {
             model = Model(ModelManager.modelDirectory(this).absolutePath)
+            VoiceDiagnosticsStore.set(this, "modelo listo", "iniciando micrófono")
             startListening()
-        } catch (_: Exception) {
+        } catch (exception: Exception) {
+            VoiceDiagnosticsStore.set(this, "error de modelo", exception.message ?: "modelo inválido")
             ttsManager.speak("No pude cargar el modelo de voz local")
             stopSelf()
         }
@@ -114,7 +127,9 @@ class VoiceActivationService : Service(), RecognitionListener {
             val recognizer = Recognizer(model, SAMPLE_RATE)
             speechService = SpeechService(recognizer, SAMPLE_RATE)
             speechService?.startListening(this)
-        } catch (_: Exception) {
+            VoiceDiagnosticsStore.set(this, "micrófono activo", "di Hola")
+        } catch (exception: Exception) {
+            VoiceDiagnosticsStore.set(this, "error de micrófono", exception.message ?: "no se pudo iniciar")
             restartListeningWithDelay(1_500L)
         }
     }
@@ -129,6 +144,7 @@ class VoiceActivationService : Service(), RecognitionListener {
         if (waitingForCommand || shuttingDown) return
         waitingForCommand = true
         stopListening()
+        VoiceDiagnosticsStore.set(this, "Hola detectado", "respondiendo")
         ttsManager.speak("Hola, ¿en qué puedo ayudarte?")
         restartListeningWithDelay(GREETING_DELAY_MS)
     }
@@ -239,8 +255,15 @@ class VoiceActivationService : Service(), RecognitionListener {
         null
     }
 
-    private fun containsWakeWord(text: String): Boolean =
-        text.lowercase().split(Regex("\\s+")).any { it.trim(',', '.', '!', '?', '¿', '¡') == WAKE_WORD }
+    private fun containsWakeWord(text: String): Boolean {
+        val normalized = text.lowercase()
+            .replace('á', 'a')
+            .replace('é', 'e')
+            .replace('í', 'i')
+            .replace('ó', 'o')
+            .replace('ú', 'u')
+        return Regex("(^|\\s)hola($|\\s|[,.!?¿¡])").containsMatchIn(normalized)
+    }
 
     private fun hasRecordAudioPermission(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
