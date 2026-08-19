@@ -125,6 +125,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/open_notification_settings"
+                    android:textColor="@color/primary"
                     app:cornerRadius="14dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -133,6 +134,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/test_voice"
+                    android:textColor="@color/on_primary"
+                    app:backgroundTint="@color/primary"
                     app:cornerRadius="14dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -181,6 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/download_model"
+                    android:textColor="@color/primary"
                     app:cornerRadius="14dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -257,37 +261,44 @@
                     android:id="@+id/switch_whatsapp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="WhatsApp" />
+                    android:text="WhatsApp"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_messenger"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Messenger" />
+                    android:text="Messenger"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_facebook"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Facebook" />
+                    android:text="Facebook"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_instagram"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Instagram" />
+                    android:text="Instagram"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_google_messages"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mensajes de Google" />
+                    android:text="Mensajes de Google"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_sms"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="SMS" />
+                    android:text="SMS"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_samsung_messages"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mensajes Samsung" />
+                    android:text="Mensajes Samsung"
+                    android:textColor="@color/text_primary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -356,22 +367,26 @@
                     android:id="@+id/switch_smart_filters"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/smart_filters_switch" />
+                    android:text="@string/smart_filters_switch"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_only_headphones"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/only_headphones_switch" />
+                    android:text="@string/only_headphones_switch"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_car_mode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/car_mode_switch" />
+                    android:text="@string/car_mode_switch"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_quiet_hours"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/quiet_hours_switch" />
+                    android:text="@string/quiet_hours_switch"
+                    android:textColor="@color/text_primary" />
                 <TextView
                     android:id="@+id/text_quiet_hours"
                     android:layout_width="match_parent"
@@ -386,12 +401,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/configure_quiet_hours"
+                    android:textColor="@color/primary"
                     app:cornerRadius="14dp" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_dark_theme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/dark_theme_switch" />
+                    android:text="@string/dark_theme_switch"
+                    android:textColor="@color/text_primary" />
                 <TextView
                     android:id="@+id/text_speech_rate"
                     android:layout_width="match_parent"
@@ -410,7 +427,8 @@
                     android:id="@+id/switch_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/history_switch" />
+                    android:text="@string/history_switch"
+                    android:textColor="@color/text_primary" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_history"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -418,6 +436,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/open_history"
+                    android:textColor="@color/primary"
                     app:cornerRadius="14dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

@@ -1,10 +1,10 @@
 # VozLuma Premium
 
-**VozLuma Premium 3.0.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 3.1.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
-Di **«Hola»** mientras la activación por voz está encendida. VozLuma responderá **«Hola, ¿en qué puedo ayudarte?»** y escuchará una orden breve. El reconocimiento usa el modelo español local de Vosk, que se descarga una sola vez desde la app. No se requiere una cuenta de VozLuma ni una conexión a Internet durante la escucha.
+Di **«Hola»** mientras la activación por voz está encendida. VozLuma responderá **«Hola, ¿en qué puedo ayudarte?»** y escuchará una orden breve. Esta edición incluye el modelo español ligero de Vosk dentro de la APK y lo instala en el almacenamiento privado la primera vez. No se requiere una cuenta de VozLuma ni una conexión a Internet durante la escucha.
 
 La edición premium mantiene una separación segura entre comandos informativos y acciones sensibles. Puede preparar un borrador de respuesta dictada, pero no envía mensajes automáticamente: muestra una pantalla de revisión y el usuario decide si quiere editarlo y compartirlo mediante una aplicación del teléfono.
 
@@ -12,7 +12,7 @@ La edición premium mantiene una separación segura entre comandos informativos 
 
 | Área | Funciones |
 |---|---|
-| Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español. |
+| Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español; el modelo viene integrado en la APK. |
 | Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
 | Música offline | Reproducir, pausar, detener, siguiente, anterior, abrir reproductor y subir/bajar volumen mediante MediaSession y teclas multimedia del sistema. |
 | Suite de teléfono | Llamadas con marcador y confirmación, SMS preparados para revisar, cámara, mapas, alarmas, calendario y ajustes. |
@@ -36,7 +36,7 @@ La interfaz fue rediseñada con Material 3, tarjetas redondeadas, jerarquía vis
 
 ## Modelo local
 
-La app descarga una sola vez `vosk-model-small-es-0.42` desde la tarjeta **Modelo de voz offline**. El catálogo oficial de Vosk lo describe como un modelo español ligero para Android y Raspberry Pi, con un tamaño comprimido aproximado de 39 MB [2]. Después de la descarga, el reconocimiento funciona sin Internet y la APK inicial queda aproximadamente en 45 MB.
+La APK incluye `vosk-model-small-es-0.42` y lo copia una sola vez al almacenamiento privado desde la tarjeta **Modelo de voz offline**. El catálogo oficial de Vosk lo describe como un modelo español ligero para Android y Raspberry Pi, con un tamaño comprimido aproximado de 39 MB [2]. Después de la instalación, el reconocimiento funciona sin Internet; la APK final ocupa aproximadamente 83 MB.
 
 ## Requisitos
 
@@ -50,7 +50,7 @@ La app descarga una sola vez `vosk-model-small-es-0.42` desde la tarjeta **Model
 | Compile SDK | 35 |
 | Android mínimo | API 26 / Android 8.0 |
 | Application ID | `com.vozluma.premium` |
-| Modelo inicial | Descarga única desde la app; Internet solo durante la configuración |
+| Modelo inicial | Incluido en la APK; instalación local sin Internet |
 | Diagnóstico | Estado visible de modelo, micrófono, escucha y detección de «Hola» |
 
 ## Compilación
@@ -61,13 +61,13 @@ Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. T
 ./gradlew assembleDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.0.0.apk`.
+El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.1.0.apk`.
 
 Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
 
 ## Configuración inicial
 
-Instala el APK y concede teléfono/contactos cuando Android lo solicite. Abre VozLuma con Internet disponible y pulsa **Descargar modelo español**. Espera a que aparezca **Modelo instalado**. Después abre **Conceder acceso a notificaciones**, activa VozLuma en los ajustes del sistema y confirma el aviso. Activa **Asistente activo**, habilita **Activación por voz: «Hola»** y concede el permiso de micrófono. El botón **Probar la voz** inicia una prueba guiada y te indica cuándo decir «Hola».
+Instala el APK y concede teléfono/contactos cuando Android lo solicite. Abre VozLuma y pulsa **Instalar modelo español**; el modelo se copia desde la propia APK, sin depender de Internet. Espera a que aparezca **Modelo instalado**. Después abre **Conceder acceso a notificaciones**, activa VozLuma en los ajustes del sistema y confirma el aviso. Activa **Asistente activo**, habilita **Activación por voz: «Hola»** y concede el permiso de micrófono. El botón **Probar la voz** inicia una prueba guiada y te indica cuándo decir «Hola».
 
 Mientras el micrófono está activo, Android muestra una notificación permanente de servicio. Esto es deliberado: permite al usuario saber que la aplicación está escuchando. Android impone requisitos de tipo y permisos para servicios de primer plano que usan micrófono, y puede restringir el inicio de ese servicio desde segundo plano [3]. Por eso algunos fabricantes pueden detener la escucha tras reiniciar o aplicar ahorro de batería; si ocurre, abre la aplicación y vuelve a activar el interruptor.
 
@@ -84,7 +84,8 @@ El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. 
 ```text
 app/src/main/
 ├── AndroidManifest.xml
-├── filesDir/model-es/                    # Modelo descargado en el dispositivo
+├── assets/vosk-model-small-es-0.42.zip   # Modelo español integrado
+├── filesDir/model-es/                    # Modelo instalado en el dispositivo
 ├── java/com/vozluma/app/
 │   ├── AudioRouteChecker.kt
 │   ├── CustomCommandStore.kt
@@ -118,5 +119,4 @@ app/src/main/
 [1]: https://developer.android.com/develop/ui/views/layout/edge-to-edge "Display content edge-to-edge in views — Android Developers"
 [2]: https://alphacephei.com/vosk/models "Vosk Models"
 [3]: https://developer.android.com/develop/background-work/services/fgs/service-types "Foreground service types — Android Developers"
-[4]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"
 [4]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"

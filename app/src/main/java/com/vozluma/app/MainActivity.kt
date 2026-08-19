@@ -223,7 +223,9 @@ class MainActivity : AppCompatActivity() {
                         modelStatusText.setText(R.string.model_ready)
                         modelDownloadButton.isEnabled = false
                     } else {
-                        modelStatusText.setText(R.string.model_download_error)
+                        val detail = result.exceptionOrNull()?.message?.takeIf { it.isNotBlank() }
+                            ?: getString(R.string.model_download_error)
+                        modelStatusText.text = getString(R.string.model_download_error_details, detail)
                         modelDownloadButton.isEnabled = true
                     }
                 }
@@ -336,8 +338,9 @@ class MainActivity : AppCompatActivity() {
             ?.takeIf { it in 0..100 } ?: 0
         val stats = android.os.StatFs(filesDir.absolutePath)
         val freeGb = stats.availableBytes / (1024L * 1024L * 1024L)
+        val modelState = if (ModelManager.isReady(this)) "instalado" else "pendiente"
         findViewById<TextView>(R.id.text_device_insights).text =
-            getString(R.string.insights_value, battery, freeGb)
+            getString(R.string.insights_value, battery, freeGb, modelState)
     }
 
     private fun updateSpeechRateLabel(progress: Int) {
