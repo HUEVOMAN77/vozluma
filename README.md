@@ -1,6 +1,6 @@
 # VozLuma Premium
 
-**VozLuma Premium 2.2.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
+**VozLuma Premium 3.0.0** es un asistente Android offline en Kotlin con una interfaz premium, activación local por voz y controles de privacidad. Su objetivo es anunciar notificaciones y llamadas, permitir comandos hablados y mantener el procesamiento sensible en el propio teléfono.
 
 ## Experiencia principal
 
@@ -15,6 +15,9 @@ La edición premium mantiene una separación segura entre comandos informativos 
 | Activación por voz | Palabra «Hola», respuesta inicial, modo conversación breve y reconocimiento offline en español. |
 | Comandos | Hora, fecha, estado, salud, batería, almacenamiento, dispositivo, conectividad, cálculos, recordatorios locales, resúmenes, modo coche, temporizadores, ajustes de sonido/Bluetooth y ayuda. |
 | Música offline | Reproducir, pausar, detener, siguiente, anterior, abrir reproductor y subir/bajar volumen mediante MediaSession y teclas multimedia del sistema. |
+| Suite de teléfono | Llamadas con marcador y confirmación, SMS preparados para revisar, cámara, mapas, alarmas, calendario y ajustes. |
+| Accesibilidad | Lectura de pantalla y acciones globales opcionales, siempre activadas manualmente por el usuario. |
+| Rutinas | Modo dormir, estudio, trabajo, viaje, coche, casa y normal con preferencias locales. |
 | Respuestas | Dictado local de un borrador, revisión, edición y selector de aplicación; nunca hay envío automático. |
 | Notificaciones | WhatsApp, Messenger, Facebook, Instagram, Mensajes de Google, SMS y Mensajes Samsung, con selección individual, deduplicación y filtros inteligentes. |
 | Prioridades | Contactos prioritarios que pueden superar el horario silencioso; alertas con palabras de emergencia también reciben tratamiento especial. |
@@ -58,7 +61,7 @@ Abre la carpeta raíz en Android Studio y espera la sincronización de Gradle. T
 ./gradlew assembleDebug
 ```
 
-El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Offline-2.1.0.apk`.
+El APK se crea en `app/build/outputs/apk/debug/app-debug.apk`. El repositorio incluye una copia en `artifacts/VozLuma-Suite-3.0.0.apk`.
 
 Esta edición usa el identificador `com.vozluma.premium` para evitar conflictos de firma con prototipos anteriores. Puede instalarse junto a versiones antiguas; si quieres conservar una sola app, desinstala primero el prototipo anterior y luego instala esta edición.
 
@@ -74,7 +77,7 @@ Mientras el micrófono está activo, Android muestra una notificación permanent
 
 Los comandos que pueden producir efectos externos se mantienen deliberadamente seguros. La respuesta dictada se guarda como borrador local y requiere revisión explícita; el selector del sistema permite elegir la aplicación destino. El centro de privacidad permite borrar historial, contactos prioritarios y borradores. El usuario también puede abrir directamente los ajustes de permisos de Android.
 
-El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA. El control de música funciona cuando el reproductor tiene una sesión multimedia activa o acepta teclas multimedia del sistema; seleccionar una canción concreta depende de las capacidades de cada reproductor.
+El reconocimiento offline puede equivocarse con ruido, acentos o frases cortas. La palabra «Hola» funciona como disparador, pero la escucha debe activarse explícitamente y el servicio permanece visible mediante la notificación del sistema. La aplicación no promete escucha oculta ni reactivación automática universal después de un reinicio. El dashboard muestra el diagnóstico técnico actual: modelo pendiente, micrófono activo, error de escucha o «Hola detectado». Las consultas generales que no estén en la biblioteca local responden con claridad que requieren Internet; no se simula una respuesta de IA. El control de música funciona cuando el reproductor tiene una sesión multimedia activa o acepta teclas multimedia del sistema; seleccionar una canción concreta depende de las capacidades de cada reproductor. El control de pantalla requiere activar manualmente el servicio de accesibilidad desde Ajustes; Android reserva ese mecanismo para herramientas de asistencia general [4].
 
 ## Estructura principal
 
@@ -84,11 +87,14 @@ app/src/main/
 ├── filesDir/model-es/                    # Modelo descargado en el dispositivo
 ├── java/com/vozluma/app/
 │   ├── AudioRouteChecker.kt
+│   ├── CustomCommandStore.kt
+│   ├── CustomCommandsActivity.kt
 │   ├── BootReceiver.kt
 │   ├── HistoryActivity.kt
 │   ├── HistoryStore.kt
 │   ├── IncomingCallReceiver.kt
 │   ├── MainActivity.kt
+│   ├── MediaControlManager.kt
 │   ├── NotificationService.kt
 │   ├── PreferencesStore.kt
 │   ├── PriorityContactsActivity.kt
@@ -97,6 +103,7 @@ app/src/main/
 │   ├── ReplyDraftStore.kt
 │   ├── TTSManager.kt
 │   ├── VoiceActivationService.kt
+│   ├── VozLumaAccessibilityService.kt
 │   └── VozLumaWidgetProvider.kt
 └── res/
     ├── drawable/
@@ -111,3 +118,5 @@ app/src/main/
 [1]: https://developer.android.com/develop/ui/views/layout/edge-to-edge "Display content edge-to-edge in views — Android Developers"
 [2]: https://alphacephei.com/vosk/models "Vosk Models"
 [3]: https://developer.android.com/develop/background-work/services/fgs/service-types "Foreground service types — Android Developers"
+[4]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"
+[4]: https://developer.android.com/guide/topics/ui/accessibility/service "Create an accessibility service — Android Developers"

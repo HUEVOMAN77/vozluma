@@ -255,6 +255,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_history).setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
+        findViewById<Button>(R.id.button_accessibility_settings).setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
         findViewById<Button>(R.id.button_custom_commands).setOnClickListener {
             startActivity(Intent(this, CustomCommandsActivity::class.java))
         }

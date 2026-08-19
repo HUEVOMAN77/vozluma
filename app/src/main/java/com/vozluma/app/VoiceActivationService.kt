@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
@@ -13,6 +14,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.AlarmClock
+import android.provider.CalendarContract
+import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import org.json.JSONObject
@@ -219,6 +223,25 @@ class VoiceActivationService : Service(), RecognitionListener {
                 MediaControlManager.openMusicApp(this)
                 "Abrí el reproductor de música"
             }
+            normalized.contains("llama a") || normalized.contains("llamar a") -> callContact(command)
+            normalized.contains("envía un mensaje") || normalized.contains("envia un mensaje") ||
+                normalized.contains("manda un mensaje") || normalized.contains("manda un sms") -> prepareSms(command)
+            normalized.contains("abre la cámara") || normalized.contains("abre la camara") ||
+                normalized.contains("toma una foto") || normalized.contains("saca una foto") -> openCamera()
+            normalized.contains("navega a") || normalized.contains("llévame a") || normalized.contains("llevame a") ||
+                normalized.contains("abre el mapa") -> openMap(command)
+            normalized.contains("crea una alarma") || normalized.contains("pon una alarma") -> createAlarm(command)
+            normalized.contains("calendario") || normalized.contains("crea un evento") || normalized.contains("crear un evento") ->
+                openCalendar(command)
+            normalized.contains("lee la pantalla") || normalized.contains("qué hay en pantalla") ||
+                normalized.contains("que hay en pantalla") -> readScreen()
+            normalized == "volver" || normalized.contains("retrocede") -> globalAccessibilityAction("back")
+            normalized.contains("ir al inicio") || normalized.contains("pantalla de inicio") -> globalAccessibilityAction("home")
+            normalized.contains("abre las notificaciones") -> globalAccessibilityAction("notifications")
+            normalized.contains("ajustes del teléfono") || normalized.contains("ajustes del telefono") -> {
+                openSystemSettings(Settings.ACTION_SETTINGS)
+                "Abrí los ajustes del teléfono"
+            }
             normalized.contains("silencia") || normalized.contains("modo silencio") -> {
                 PreferencesStore.setAssistantEnabled(this, false)
                 "Listo, silencié el asistente"
@@ -230,6 +253,28 @@ class VoiceActivationService : Service(), RecognitionListener {
             normalized.contains("desactiva") || normalized.contains("apaga") -> {
                 PreferencesStore.setAssistantEnabled(this, false)
                 "Listo, desactivé el asistente"
+            }
+            normalized.contains("modo dormir") || normalized.contains("modo sueño") || normalized.contains("modo sueno") -> {
+                PreferencesStore.setQuietHours(this, "22:00", "07:00")
+                PreferencesStore.setQuietHoursEnabled(this, true)
+                PreferencesStore.setCarModeEnabled(this, false)
+                "Activé el modo dormir: reduciré los avisos entre las diez de la noche y las siete de la mañana"
+            }
+            normalized.contains("modo estudio") || normalized.contains("modo trabajo") -> {
+                PreferencesStore.setQuietHours(this, "08:00", "18:00")
+                PreferencesStore.setQuietHoursEnabled(this, true)
+                PreferencesStore.setCarModeEnabled(this, false)
+                "Activé el modo estudio con avisos reducidos durante el horario configurado"
+            }
+            normalized.contains("modo viaje") || normalized.contains("modo conducción") || normalized.contains("modo conduccion") -> {
+                PreferencesStore.setCarModeEnabled(this, true)
+                PreferencesStore.setQuietHoursEnabled(this, false)
+                "Activé el modo viaje y coche"
+            }
+            normalized.contains("modo normal") || normalized.contains("modo casa") -> {
+                PreferencesStore.setCarModeEnabled(this, false)
+                PreferencesStore.setQuietHoursEnabled(this, false)
+                "Volví al modo normal"
             }
             normalized.contains("modo coche") || normalized.contains("modo auto") -> {
                 PreferencesStore.setCarModeEnabled(this, true)
@@ -280,6 +325,121 @@ class VoiceActivationService : Service(), RecognitionListener {
         }
         ttsManager.speak(answer)
         restartListeningWithDelay(COMMAND_DELAY_MS)
+    }
+
+    private fun callContact(command: String): String {
+        val query = command.substringAfter("llama a", command.substringAfter("llamar a", "")).trim()
+        if (query.isBlank()) return "Dime el nombre del contacto al que quieres llamar"
+        val number = findContactNumber(query)
+            ?: return "No encontré a $query en tus contactos o falta el permiso de contactos"
+        startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}")).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
+        return "Abrí el marcador para llamar a $query. Revisa el número y confirma la llamada"
+    }
+
+    private fun prepareSms(command: String): String {
+        val normalized = command.lowercase()
+        val recipientText = command.substringAfter(" a ", "")
+            .substringBefore(" diciendo ")
+            .substringBefore(" que diga ")
+            .trim()
+        val body = when {
+            normalized.contains(" diciendo ") -> command.substringAfter(" diciendo ").trim()
+            normalized.contains(" que diga ") -> command.substringAfter(" que diga ").trim()
+            else -> ""
+        }
+        if (recipientText.isBlank() || body.isBlank()) {
+            return "Di: envía un mensaje a mamá diciendo llego en diez minutos"
+        }
+        val number = findContactNumber(recipientText)
+            ?: return "No encontré a $recipientText en tus contactos o falta el permiso de contactos"
+        startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(number)}")).apply {
+            putExtra("sms_body", body)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
+        return "Preparé el mensaje para $recipientText. Revísalo y pulsa enviar"
+    }
+
+    private fun findContactNumber(query: String): String? {
+        if (checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) return null
+        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+        val selection = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} LIKE ?"
+        val args = arrayOf("%${query.trim()}%")
+        return contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            projection,
+            selection,
+            args,
+            "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) cursor.getString(0) else null
+        }
+    }
+
+    private fun openCamera(): String {
+        return try {
+            startActivity(Intent(MediaStore.ACTION_IMAGE_CAPTURE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            "Abrí la cámara"
+        } catch (_: Exception) {
+            "No encontré una aplicación de cámara"
+        }
+    }
+
+    private fun openMap(command: String): String {
+        val destination = command.substringAfter("navega a", command.substringAfter("llévame a", command.substringAfter("llevame a", ""))).trim()
+        if (destination.isBlank()) return "Dime a qué lugar quieres navegar"
+        return try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${Uri.encode(destination)}")).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+            "Abrí el mapa para $destination"
+        } catch (_: Exception) {
+            "No encontré una aplicación de mapas"
+        }
+    }
+
+    private fun createAlarm(command: String): String {
+        val match = Regex("(\\d{1,2})(?:[:.](\\d{1,2}))?").find(command)
+            ?: return "Dime la hora, por ejemplo: crea una alarma a las 7:30"
+        val hour = match.groupValues[1].toIntOrNull() ?: return "No entendí la hora"
+        val minute = match.groupValues.getOrNull(2)?.toIntOrNull() ?: 0
+        if (hour !in 0..23 || minute !in 0..59) return "La hora no es válida"
+        startActivity(Intent(AlarmClock.ACTION_SET_ALARM).apply {
+            putExtra(AlarmClock.EXTRA_HOUR, hour)
+            putExtra(AlarmClock.EXTRA_MINUTES, minute)
+            putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        })
+        return "Preparé una alarma para las %02d:%02d. Confirma en la aplicación de reloj".format(hour, minute)
+    }
+
+    private fun openCalendar(command: String): String {
+        val title = command.substringAfter("evento", "").trim().ifBlank { "Evento de VozLuma" }
+        return try {
+            startActivity(Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
+                putExtra(CalendarContract.Events.TITLE, title)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+            "Abrí el calendario para preparar el evento. Revísalo y guárdalo"
+        } catch (_: Exception) {
+            "No encontré una aplicación de calendario"
+        }
+    }
+
+    private fun readScreen(): String =
+        VozLumaAccessibilityService.current?.readVisibleScreen()
+            ?: "Activa primero el control avanzado de pantalla desde los ajustes de accesibilidad"
+
+    private fun globalAccessibilityAction(action: String): String {
+        val service = VozLumaAccessibilityService.current
+            ?: return "Activa primero el control avanzado de pantalla desde los ajustes de accesibilidad"
+        val performed = when (action) {
+            "back" -> service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
+            "home" -> service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME)
+            else -> service.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS)
+        }
+        return if (performed) "Listo" else "Android no permitió esa acción"
     }
 
     private fun calculateAnswer(text: String): String {
@@ -333,7 +493,7 @@ class VoiceActivationService : Service(), RecognitionListener {
     }
 
     private fun helpAnswer(): String =
-        "Puedo decirte la hora y la fecha, reproducir, pausar o cambiar canciones, controlar el volumen, leer notificaciones, darte resúmenes, calcular, guardar recordatorios locales, crear temporizadores, abrir ajustes y responder a tus comandos personalizados"
+        "Puedo controlar música, volumen, llamadas y mensajes con confirmación, abrir cámara y mapas, crear alarmas y eventos, leer la pantalla si activas accesibilidad, cambiar rutinas y responder a tus comandos personalizados"
 
     private fun parseMinutes(text: String): Int? {
         Regex("\\d+").find(text)?.value?.toIntOrNull()?.let { return it }

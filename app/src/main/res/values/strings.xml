@@ -58,6 +58,9 @@
     <string name="custom_command_required">Completa la frase y la respuesta.</string>
     <string name="custom_command_saved">Comando guardado en este teléfono.</string>
     <string name="clear_custom_commands">Borrar comandos personalizados</string>
+    <string name="accessibility_service_label">VozLuma: control por accesibilidad</string>
+    <string name="accessibility_service_description">Permite leer la pantalla y ejecutar acciones globales mediante comandos de voz, solo cuando el usuario activa el servicio manualmente.</string>
+    <string name="open_accessibility_settings">Activar control avanzado de pantalla</string>
     <string name="privacy_center_title">Privacidad y control</string>
     <string name="privacy_center_description">VozLuma te muestra qué procesa, qué permisos usa y te permite borrar los datos locales con un toque.</string>
     <string name="privacy_local_title">Procesamiento local</string>
